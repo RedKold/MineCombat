@@ -15,7 +15,7 @@ We are 宇宙超级无敌大(SuperBig42) team who are taking part in the Netease
 
 #### 事件注册教程
 1.  使用静态类EventManager管理事件，用户只能调用唯一的外部接口Bind来绑定新的Action
-···cs
+```cs
 EventManager.Bind("SomeEvent", yourAction)
 2.  事件在EventManager的static块中硬编码注册，后续也许会改成读文件注册
 3.  在程序内部可以任意调用EventManager.Trigger<T>(name, <T>paras)来执行绑定的所有Action，参数按值传递
@@ -25,7 +25,7 @@ EventManager.Bind("SomeEvent", yourAction)
 #### Parser的使用说明
 1.  Parser是一个静态工具类，用于处理字符串到任意集合的转换，一般返回一个List或HashSet
 2.  目前只有ToCollection一个方法，返回无字典集合，第二个参数控制了最大深度（如果存在第x+1层结构，直接返回null或报错），第三个参数控制是否严格测试（默认false，若为true，任何异常都会报错，否则返回null）
-···cs
+```cs
 Parser.ToCollection("{a, b, {{c, d}, e}}", 3, false) //返回该结构的HashSet<object>
 Parser.ToCollection("{a, b, {{c, d}, e}}", 2, false) //返回null
 Parser.ToCollection("{a, b, {{c, d}, e}}", 2, true) //报错
