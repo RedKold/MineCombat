@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -6,7 +6,8 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 
-namespace MineCombat {
+namespace MineCombat
+{
     internal interface IEvent
     {
         void Bind(Delegate dlg);
@@ -14,11 +15,11 @@ namespace MineCombat {
 
     internal class Event : IEvent
     {
-        #nullable enable
+#nullable enable
         private Action _actions;
         private Action? _finalize;
 
-        internal Event(Action prepare, Action? finalize)
+        internal Event(Action prepare, Action? finalize = null)
         {
             _actions = prepare;
             _finalize = finalize;
@@ -38,19 +39,19 @@ namespace MineCombat {
             _finalize?.Invoke();
         }
 
-        #nullable disable
+#nullable disable
     }
 
     internal class Event<T> : IEvent
     {
-        #nullable enable
+#nullable enable
         private Action<T> _actions;
         private Action<T>? _finalize;
 
         private IOrderedEnumerable<FieldInfo>? _fields;
         private string _parasName;
 
-        internal Event(Action<T> prepare, Action<T>? finalize)
+        internal Event(Action<T> prepare, Action<T>? finalize = null)
         {
             _actions = prepare;
             _finalize = finalize;
@@ -112,7 +113,7 @@ namespace MineCombat {
             _finalize?.Invoke(para);
         }
 
-        #nullable disable
+#nullable disable
     }
     public static class EventManager
     {
@@ -135,7 +136,7 @@ namespace MineCombat {
                 if (revt is Event<T> evt)
                     evt.Trigger(para);
                 else
-                    throw new ArgumentException($"参数错误");
+                    throw new ArgumentException($"事件{name}参数错误");
             }
             else
                 throw new ArgumentException($"事件{name}不存在");
@@ -148,7 +149,7 @@ namespace MineCombat {
                 if (revt is Event evt)
                     evt.Trigger();
                 else
-                    throw new ArgumentException($"参数错误");
+                    throw new ArgumentException($"事件{name}参数错误");
             }
             else
                 throw new ArgumentException($"事件{name}不存在");
@@ -156,9 +157,7 @@ namespace MineCombat {
 
         static EventManager()
         {
-            events.Add("EmptyEvent", new Event(() => { }, null));
-            events.Add("TestEvent", new Event<(int x, List<string> u)>(value => { }, null));
-            events.Add("HoverEvent", new Event<(string a, string b, string c)>(value => { }, null));
+            events.Add("DamageProcess", new Event<Damage>(x => { }));
         }
     }
 }
