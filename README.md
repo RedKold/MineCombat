@@ -17,7 +17,7 @@ We are 宇宙超级无敌大(SuperBig42) team who are taking part in the Netease
 1.  使用静态类EventManager管理事件，用户只能调用唯一的外部接口Bind来绑定新的Action
 ```cs
 EventManager.Bind("SomeEvent", yourAction)
-```cs
+```
 2.  事件在EventManager的static块中硬编码注册，后续也许会改成读文件注册
 3.  在程序内部可以任意调用EventManager.Trigger<T>(name, <T>paras)来执行绑定的所有Action，参数按值传递
 4.  若传递多个参数，将其以元组形式传递 --> (string a, int b, bool c)
@@ -30,7 +30,7 @@ EventManager.Bind("SomeEvent", yourAction)
 Parser.ToCollection("{a, b, {{c, d}, e}}", 3, false) //返回该结构的HashSet<object>
 Parser.ToCollection("{a, b, {{c, d}, e}}", 2, false) //返回null
 Parser.ToCollection("{a, b, {{c, d}, e}}", 2, true) //报错
-```cs
+```
 
 #### 标签和标签集合
 1.  一般来说不必关注ITag，只需关注ITags，它有两个实现类StaticTags和Tags。前者是内存可空且不可修改的，只能包含一级结构，初始化性能更好，但只能作为被Match的目标；后者必定占用内存，可以动态修改，可以包含二级结构
