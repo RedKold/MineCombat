@@ -1,5 +1,5 @@
 ﻿using MineCombat;
-
+using System;
 public static class Program
 {
     public static void Main(string[] args)
@@ -7,7 +7,7 @@ public static class Program
         Damage damage1 = new("mc_common", 10);
         Damage damage2 = new("mc_magic", 10);
 
-        EventManager.Bind("DamageProcess", ArmorDefense);
+       EventManager.Bind("DamageProcess", new Action<Damage>(ArmorDefense));
 
         Console.WriteLine($"Damage1 is {damage1.Get()}\nDamage2 is {damage2.Get()}");
     }
