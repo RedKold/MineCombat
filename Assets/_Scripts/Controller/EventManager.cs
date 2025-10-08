@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -6,21 +6,52 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 
-namespace MineCombat {
+namespace MineCombat
+{
     internal interface IEvent
     {
         void Bind(Delegate dlg);
     }
 
+    internal class Event : IEvent
+    {
+#nullable enable
+        private Action _actions;
+        private Action? _finalize;
+
+        internal Event(Action prepare, Action? finalize = null)
+        {
+            _actions = prepare;
+            _finalize = finalize;
+        }
+
+        void IEvent.Bind(Delegate dlg)
+        {
+            if (dlg is Action act)
+                _actions += act;
+            else
+                throw new ArgumentException("需要无参数的无返回值函数");
+        }
+
+        internal void Trigger()
+        {
+            _actions();
+            _finalize?.Invoke();
+        }
+
+#nullable disable
+    }
+
     internal class Event<T> : IEvent
     {
+#nullable enable
         private Action<T> _actions;
         private Action<T>? _finalize;
 
         private IOrderedEnumerable<FieldInfo>? _fields;
         private string _parasName;
 
-        internal Event(Action<T> prepare, Action<T>? finalize)
+        internal Event(Action<T> prepare, Action<T>? finalize = null)
         {
             _actions = prepare;
             _finalize = finalize;
@@ -31,14 +62,14 @@ namespace MineCombat {
             {
                 var genericType = type.GetGenericTypeDefinition();
                 isTuple = genericType == typeof(Tuple<>) ||
-                       genericType == typeof(Tuple<,>) ||
-                       genericType == typeof(Tuple<,,>) ||
-                       genericType == typeof(Tuple<,,,>) ||
-                       genericType == typeof(Tuple<,,,,>) ||
-                       genericType == typeof(Tuple<,,,,,>) ||
-                       genericType == typeof(Tuple<,,,,,,>) ||
-                       genericType == typeof(Tuple<,,,,,,,>) ||
-                       genericType.FullName?.StartsWith("System.ValueTuple") == true;
+                          genericType == typeof(Tuple<,>) ||
+                          genericType == typeof(Tuple<,,>) ||
+                          genericType == typeof(Tuple<,,,>) ||
+                          genericType == typeof(Tuple<,,,,>) ||
+                          genericType == typeof(Tuple<,,,,,>) ||
+                          genericType == typeof(Tuple<,,,,,,>) ||
+                          genericType == typeof(Tuple<,,,,,,,>) ||
+                          genericType.FullName?.StartsWith("System.ValueTuple") == true;
             }
 
             if (isTuple)
@@ -58,10 +89,11 @@ namespace MineCombat {
         {
             if (dlg is Action<T> act)
                 return act;
-            var paras = dlg.Method.GetParameters();
-            if (_fields is not null && paras.Length == _fields.ToArray().Length && paras.Select(p => p.ParameterType).SequenceEqual(_fields.Select(f => f.FieldType)))
+            if (_fields is not null)
             {
-                return tuple => { dlg.Method.Invoke(dlg.Target, _fields.Select(f => f.GetValue(tuple)).ToArray()); };
+                var paras = dlg.Method.GetParameters();
+                if (paras.Length == _fields.ToArray().Length && paras.Select(p => p.ParameterType).SequenceEqual(_fields.Select(f => f.FieldType)))
+                    return tuple => { dlg.Method.Invoke(dlg.Target, _fields.Select(f => f.GetValue(tuple)).ToArray()); };
             }
             return null;
         }
@@ -78,11 +110,10 @@ namespace MineCombat {
         internal void Trigger(T para)
         {
             _actions(para);
-            if (_finalize is not null)
-            {
-                _finalize(para);
-            }
+            _finalize?.Invoke(para);
         }
+
+#nullable disable
     }
     public static class EventManager
     {
@@ -105,7 +136,20 @@ namespace MineCombat {
                 if (revt is Event<T> evt)
                     evt.Trigger(para);
                 else
-                    throw new ArgumentException($"参数错误");
+                    throw new ArgumentException($"事件{name}参数错误");
+            }
+            else
+                throw new ArgumentException($"事件{name}不存在");
+        }
+
+        internal static void Trigger(string name)
+        {
+            if (events.TryGetValue(name, out var revt))
+            {
+                if (revt is Event evt)
+                    evt.Trigger();
+                else
+                    throw new ArgumentException($"事件{name}参数错误");
             }
             else
                 throw new ArgumentException($"事件{name}不存在");
@@ -113,8 +157,7 @@ namespace MineCombat {
 
         static EventManager()
         {
-            events.Add("TestEvent", new Event<(int x, List<string> u)>(value => { }, null));
-            events.Add("HoverEvent", new Event<(string a, string b, string c)>(value => { }, null));
+            events.Add("DamageProcess", new Event<Damage>(x => { }));
         }
     }
 }
