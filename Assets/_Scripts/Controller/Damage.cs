@@ -7,56 +7,26 @@ using System.Xml.Linq;
 
 namespace MineCombat
 {
-    public class DamageModifier
+    public static class DamageModifier
     {
-        internal enum Type { ADD, MUL }
-
-        internal readonly Type type;
-        internal readonly uint priority;
-        internal ITags tags;
-        private double _value;
-
-        internal DamageModifier(Type type, double value, uint priority, ITags tags)
+        public static DamageModifierAdd CreateAdd(double value, uint priority, ITags tags)
         {
-            this.type = type;
-            _value = value;
-            this.priority = priority;
-            this.tags = tags;
+            return new DamageModifierAdd(value, priority, tags);
         }
 
-        public static DamageModifier CreateAdd(double value, uint priority, ITags tags)
+        public static DamageModifierMul CreateMul(double value, uint priority, ITags tags)
         {
-            return new DamageModifier(Type.ADD, value, priority, tags);
+            return new DamageModifierMul(value, priority, tags);
         }
 
-        public static DamageModifier CreateMul(double value, uint priority, ITags tags)
+        public static DamageModifierMulTotal CreateMulTotal(double value, uint priority, ITags tags)
         {
-            return new DamageModifier(Type.MUL, value, priority, tags);
+            return new DamageModifierMulTotal(value, priority, tags);
         }
 
-        //此修改器是否忽略该类型的伤害
-        internal bool Ignore(string dmgid)
+        public static DamageModifierCustom CreateCustom(Process<double> processer, uint priority, ITags tags)
         {
-            return DamageTypes.Ignore(dmgid, tags);
-        }
-
-        internal bool TryMerge(DamageModifier mdf)
-        {
-            if (mdf.type == type && mdf.priority == priority)
-            {
-                _value += mdf._value;
-                return true;
-            }
-            else 
-                return false;
-        }
-        internal void Process(ref double damage)
-        {
-            switch (type)
-            {
-                case Type.ADD: damage += _value; break;
-                case Type.MUL: damage *= Math.Max(0, (1 + _value)); break;
-            }
+            return new DamageModifierCustom(processer, priority, tags);
         }
     }
 
@@ -64,9 +34,9 @@ namespace MineCombat
     {
         public readonly string type;
         public double value;
-        private Dictionary<string, DamageModifier> _modifiers;
+        private Dictionary<string, Modifier<double>> _modifiers;
 
-        internal Damage(string type, float value, Dictionary<string, DamageModifier>? modifiers = null)
+        internal Damage(string type, float value, Dictionary<string, Modifier<double>>? modifiers = null)
         {
             this.type = type;
             this.value = value;
@@ -74,7 +44,7 @@ namespace MineCombat
         }
 
         //添加、合并或替换
-        internal void AddModifier(string mdfid, DamageModifier mdf)
+        internal void AddModifier(string mdfid, Modifier<double> mdf)
         {
             if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(mdf)))
                 _modifiers[mdfid] = mdf;
@@ -88,12 +58,12 @@ namespace MineCombat
         internal double Get()
         {
             EventManager.Trigger("DamageProcess", this);
-            List<DamageModifier> modifiers = _modifiers.Values.ToList();
-            modifiers.Sort((x, y) => x.priority.CompareTo(y.priority));
+            List<Modifier<double>> modifiers = _modifiers.Values.ToList();
+            modifiers.Sort((x, y) => x.CompareTo(y));
             double value = this.value;
             foreach (var mdf in modifiers)
             {
-                if (!mdf.Ignore(type))
+                if (!DamageTypes.Ignore(type, mdf.tags))
                     mdf.Process(ref value);
             }
             return value;

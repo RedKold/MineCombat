@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-// using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MineCombat
 {
@@ -145,6 +144,8 @@ namespace MineCombat
     //静态标签集合只作为匹配目标，不需要复杂内部结构，也不能通过ITag初始化
     public class StaticTags : ITags
     {
+        public static StaticTags Empty = new StaticTags();
+
 #nullable enable
         protected readonly HashSet<string>? _tags;
 
