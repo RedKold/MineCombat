@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace MineCombat
 {
-    public static class DamageModifier
+    public static class DamageModifiers
     {
         public static DamageModifierAdd CreateAdd(double value, uint priority, ITags tags)
         {
@@ -34,9 +33,9 @@ namespace MineCombat
     {
         public readonly string type;
         public double value;
-        private Dictionary<string, Modifier<double>> _modifiers;
+        private Dictionary<string, Modifier<Damage>> _modifiers;
 
-        internal Damage(string type, float value, Dictionary<string, Modifier<double>>? modifiers = null)
+        internal Damage(string type, float value, Dictionary<string, Modifier<Damage>>? modifiers = null)
         {
             this.type = type;
             this.value = value;
@@ -44,7 +43,7 @@ namespace MineCombat
         }
 
         //添加、合并或替换
-        internal void AddModifier(string mdfid, Modifier<double> mdf)
+        internal void AddModifier(string mdfid, Modifier<Damage> mdf)
         {
             if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(mdf)))
                 _modifiers[mdfid] = mdf;
@@ -58,13 +57,12 @@ namespace MineCombat
         internal double Get()
         {
             EventManager.Trigger("DamageProcess", this);
-            List<Modifier<double>> modifiers = _modifiers.Values.ToList();
+            List<Modifier<Damage>> modifiers = _modifiers.Values.ToList();
             modifiers.Sort((x, y) => x.CompareTo(y));
             double value = this.value;
             foreach (var mdf in modifiers)
             {
-                if (!DamageTypes.Ignore(type, mdf.tags))
-                    mdf.Process(ref value);
+                mdf.Process(this);
             }
             return value;
         }

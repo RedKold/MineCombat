@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-// delete .marshalling, need further test
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MineCombat
 {
@@ -15,12 +12,14 @@ namespace MineCombat
     {
         public int Class();
         public void Process(ref T t);
+        public void Process(T t);
+        public bool TryMerge(IModifier<T> mdf);
     }
 
-    public class Modifier<T> : IModifier<T>
+    abstract public class Modifier<T> : IModifier<T>
     {
         protected uint priority;
-        internal ITags tags;
+        protected ITags tags;
 
         protected Modifier(uint priority, ITags tags)
         {
@@ -40,11 +39,22 @@ namespace MineCombat
         }
 
         virtual public void Process(ref T t) { }
-
-        virtual public bool TryMerge(Modifier<T> mdf) { return false; }
+        virtual public void Process(T t) { }
+        virtual public bool Ignore(T t) { return false; }
+        virtual public bool TryMerge(IModifier<T> mdf) { return false; }
     }
 
-    public sealed class DamageModifierAdd : Modifier<double>
+    public class DamageModifier : Modifier<Damage>
+    {
+        internal DamageModifier(uint priority, ITags tags) : base(priority, tags) { }
+
+        public override bool Ignore(Damage t)
+        {
+            return DamageTypes.Ignore(t.type, tags);
+        }
+    }
+
+    public sealed class DamageModifierAdd : Modifier<Damage>
     {
         private double _value;
 
@@ -53,12 +63,19 @@ namespace MineCombat
             _value = value;
         }
 
-        public override void Process(ref double t)
+        public override void Process(ref Damage t)
         {
-            t += _value;
+            if (!Ignore(t))
+                t.value += _value;
         }
 
-        public override bool TryMerge(Modifier<double> rmdf)
+        public override void Process(Damage t)
+        {
+            if (!Ignore(t))
+                t.value += _value;
+        }
+
+        public override bool TryMerge(IModifier<Damage> rmdf)
         {
             if (rmdf is DamageModifierAdd mdf && mdf.priority == priority)
             {
@@ -70,7 +87,7 @@ namespace MineCombat
         }
     }
 
-    public sealed class DamageModifierMul : Modifier<double>
+    public sealed class DamageModifierMul : Modifier<Damage>
     {
         private double _value;
 
@@ -79,12 +96,19 @@ namespace MineCombat
             _value = Math.Max(-1, value);
         }
 
-        public override void Process(ref double t)
+        public override void Process(ref Damage t)
         {
-            t *= (1 + _value);
+            if (!Ignore(t))
+                t.value *= (1 + _value);
         }
 
-        public override bool TryMerge(Modifier<double> rmdf)
+        public override void Process(Damage t)
+        {
+            if (!Ignore(t))
+                t.value *= (1 + _value);
+        }
+
+        public override bool TryMerge(IModifier<Damage> rmdf)
         {
             if (rmdf is DamageModifierMul mdf && mdf.priority == priority)
             {
@@ -96,7 +120,7 @@ namespace MineCombat
         }
     }
 
-    public sealed class DamageModifierMulTotal : Modifier<double>
+    public sealed class DamageModifierMulTotal : Modifier<Damage>
     {
         private double _value;
 
@@ -105,12 +129,19 @@ namespace MineCombat
             _value = value;
         }
 
-        public override void Process(ref double t)
+        public override void Process(ref Damage t)
         {
-            t *= (1 + _value);
+            if (!Ignore(t))
+                t.value *= (1 + _value);
         }
 
-        public override bool TryMerge(Modifier<double> rmdf)
+        public override void Process(Damage t)
+        {
+            if (!Ignore(t))
+                t.value *= (1 + _value);
+        }
+
+        public override bool TryMerge(IModifier<Damage> rmdf)
         {
             if (rmdf is DamageModifierMulTotal mdf && mdf.priority == priority)
             {
@@ -122,7 +153,7 @@ namespace MineCombat
         }
     }
 
-    public sealed class DamageModifierCustom : Modifier<double>
+    public sealed class DamageModifierCustom : Modifier<Damage>
     {
         private Process<double> _processer;
 
@@ -131,9 +162,16 @@ namespace MineCombat
             _processer = processer;
         }
 
-        public override void Process(ref double t)
+        public override void Process(ref Damage t)
         {
-            _processer(ref t);
+            if (!Ignore(t))
+                _processer(ref t.value);
+        }
+
+        public override void Process(Damage t)
+        {
+            if (!Ignore(t))
+                _processer(ref t.value);
         }
     }
 }
