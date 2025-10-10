@@ -13,11 +13,12 @@ namespace MineCombat
         public int Class();
         public void Process(ref T t);
         public void Process(T t);
-        public bool TryMerge(IModifier<T> mdf);
+        public bool TryMerge(IModifier<T> mdf, bool replaceTags = true, bool mergeTags = false);
     }
 
     abstract public class Modifier<T> : IModifier<T>
     {
+#nullable enable
         protected uint priority;
         protected ITags tags;
 
@@ -41,7 +42,8 @@ namespace MineCombat
         virtual public void Process(ref T t) { }
         virtual public void Process(T t) { }
         virtual public bool Ignore(T t) { return false; }
-        virtual public bool TryMerge(IModifier<T> mdf) { return false; }
+        virtual public bool TryMerge(IModifier<T> mdf, bool replaceTags = true, bool mergeTags = false) { return false; }
+#nullable disable
     }
 
     public class DamageModifier : Modifier<Damage>
@@ -50,11 +52,11 @@ namespace MineCombat
 
         public override bool Ignore(Damage t)
         {
-            return DamageTypes.Ignore(t.type, tags);
+            return DamageTags.Ignore(t.type, tags);
         }
     }
 
-    public sealed class DamageModifierAdd : Modifier<Damage>
+    public sealed class DamageModifierAdd : DamageModifier
     {
         private double _value;
 
@@ -75,10 +77,17 @@ namespace MineCombat
                 t.value += _value;
         }
 
-        public override bool TryMerge(IModifier<Damage> rmdf)
+        public override bool TryMerge(IModifier<Damage> rmdf, bool replaceTags = true, bool mergeTags = false)
         {
             if (rmdf is DamageModifierAdd mdf && mdf.priority == priority)
             {
+                if (replaceTags)
+                {
+                    if (mergeTags && tags is Tags t)
+                        t.Merge(mdf.tags);
+                    else
+                        tags = mdf.tags;
+                }
                 _value += mdf._value;
                 return true;
             }
@@ -87,7 +96,7 @@ namespace MineCombat
         }
     }
 
-    public sealed class DamageModifierMul : Modifier<Damage>
+    public sealed class DamageModifierMul : DamageModifier
     {
         private double _value;
 
@@ -108,10 +117,17 @@ namespace MineCombat
                 t.value *= (1 + _value);
         }
 
-        public override bool TryMerge(IModifier<Damage> rmdf)
+        public override bool TryMerge(IModifier<Damage> rmdf, bool replaceTags = true, bool mergeTags = false)
         {
             if (rmdf is DamageModifierMul mdf && mdf.priority == priority)
             {
+                if (replaceTags)
+                {
+                    if (mergeTags && tags is Tags t)
+                        t.Merge(mdf.tags);
+                    else
+                        tags = mdf.tags;
+                }
                 _value = Math.Max(-1, _value + mdf._value);
                 return true;
             }
@@ -120,7 +136,7 @@ namespace MineCombat
         }
     }
 
-    public sealed class DamageModifierMulTotal : Modifier<Damage>
+    public sealed class DamageModifierMulTotal : DamageModifier
     {
         private double _value;
 
@@ -141,10 +157,17 @@ namespace MineCombat
                 t.value *= (1 + _value);
         }
 
-        public override bool TryMerge(IModifier<Damage> rmdf)
+        public override bool TryMerge(IModifier<Damage> rmdf, bool replaceTags = true, bool mergeTags = false)
         {
             if (rmdf is DamageModifierMulTotal mdf && mdf.priority == priority)
             {
+                if (replaceTags)
+                {
+                    if (mergeTags && tags is Tags t)
+                        t.Merge(mdf.tags);
+                    else
+                        tags = mdf.tags;
+                }
                 _value = Math.Max(-1, (1 + _value) * (1 + mdf._value) - 1);
                 return true;
             }
@@ -153,7 +176,7 @@ namespace MineCombat
         }
     }
 
-    public sealed class DamageModifierCustom : Modifier<Damage>
+    public sealed class DamageModifierCustom : DamageModifier
     {
         private Process<double> _processer;
 
