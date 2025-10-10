@@ -32,9 +32,28 @@ Parser.ToCollection("{a, b, {{c, d}, e}}", 2, false) //返回null
 Parser.ToCollection("{a, b, {{c, d}, e}}", 2, true) //报错
 ```
 
+#### 属性管理器
+1.  Properties是经过优化的属性管理器，支持int、double、bool三个基础类型和所有引用类型，且对string有优化
+2.  Properties对象的使用方式非常简单，提供Store函数用于存入数据，Update函数用于更新数据，Change函数用于修改数据，Get的一系列衍生函数用于获取数据
+```cs
+/*下面所有“id”均为一个字符串，用于标识数据
+ *不同类型的数据使用同一个id可能会导致冲突，避免这样做*/
+
+//自动识别类型，无需泛型声明
+properties.Store(id, 36.5); //若id已存在，返回假，不操作
+properties.Update(id, "OftenOviour"); //若id不存在，返回假，但仍会创建属性并赋值
+properties.Change(id, (ref Damage dmg) => { /*对dmg的一些操作*/ }); //若id不存在，返回假，不操作
+
+//需要显示指定要获取的类型
+properties.Get<Damage>(id)； //返回值为Damage或null，性能稍差
+//不可以使用Get<int>、Get<double>、Get<bool>、Get<string>，必然会导致返回值错误（不一定为null）
+properties.GetInt(id)； //返回值为int或null，需要空判断，double、bool、string都有对应的方法，它们性能更好
+```
+
 #### 标签和标签集合
 1.  一般来说不必关注ITag，只需关注ITags，它有两个实现类StaticTags和Tags。前者是内存可空且不可修改的，只能包含一级结构，初始化性能更好；后者必定占用内存，可以动态修改，可以包含二级结构
 2.  Match行为意味着发起者将遍历自己的一级结构，只要其中任何一项（如果是二级结构，则为该项的每个内容）可以在目标中找到，则视为成功
+3.  TagsManager是存储常用标签集合的一个选择，Tags对象的构建开销较大，让常用的Tags指向同一个引用是不错的选择
 
 #### 伤害系统
 1.  DamageTypes管理所有伤害类型对应的标签集合，Ignore方法用于测试指定的伤害类型是否被提供标签集合的对象忽略
