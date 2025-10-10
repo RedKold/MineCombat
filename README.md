@@ -45,7 +45,8 @@ properties.Update(id, "OftenOviour"); //若id不存在，返回假，但仍会�
 properties.Change(id, (ref Damage dmg) => { /*对dmg的一些操作*/ }); //若id不存在，返回假，不操作
 
 //需要显示指定要获取的类型
-properties.Get<Damage>(id)； //返回值为Damage或null，性能稍差，不可以使用Get<int>、Get<double>、Get<bool>、Get<string>，必然会导致返回值错误（不一定为null）
+properties.Get<Damage>(id)； //返回值为Damage或null，性能稍差
+//不可以使用Get<int>、Get<double>、Get<bool>、Get<string>，必然会导致返回值错误（不一定为null）
 properties.GetInt(id)； //返回值为int或null，需要空判断，double、bool、string都有对应的方法，它们性能更好
 ```
 
