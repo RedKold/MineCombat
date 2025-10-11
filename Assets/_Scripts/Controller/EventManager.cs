@@ -158,6 +158,8 @@ namespace MineCombat
         static EventManager()
         {
             events.Add("DamageProcess", new Event<Damage>(x => { }));
+            events.Add("CombatantDied", new Event<Combatant>(x => { }));
+            events.Add("HealthChanged", new Event<Combatant>(x => { }));
         }
     }
 }

@@ -1,9 +1,9 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using MineCombat;
-using System;
+
 public class CombatantView : MonoBehaviour
 {
     [SerializeField] private TMP_Text nameText;
@@ -11,38 +11,82 @@ public class CombatantView : MonoBehaviour
     [SerializeField] private SpriteRenderer healthBar;
     [SerializeField] private SpriteRenderer avatar;
 
-    // Bind Combatant Data (if needed)
     private Combatant _combatant;
+    private float _displayedHealthRatio = 1f;  // 当前显示的血量比例（用于平滑动画）
 
     public void BindCombatant(Combatant combatant)
     {
         _combatant = combatant;
 
-        // Initial display
+        // 初始显示
         SetCombatant(combatant.Name, combatant.CurHP, combatant.MaxHP, avatar != null ? avatar.sprite : null);
 
-        // Subscribe to events
-        EventManager.Bind("CombatantDied", new System.Action<Combatant>(c =>
+        // 订阅死亡事件
+        EventManager.Bind("CombatantDied", new Action<Combatant>(c =>
         {
             if (c == _combatant)
             {
                 SetSelected(false);
                 ShowWrapper(false);
-                Console.WriteLine($"{c.Name} has died.");
+                Debug.Log($"{c.Name} has died.");
             }
         }));
 
-        // Subscribe to damage event 
-        EventManager.Bind("DamageProcess", new Action<Damage>(dmg =>
+        // 订阅血量变化事件
+        EventManager.Bind("HealthChanged", new Action<Combatant>(c =>
         {
-            // Example: If this combatant is the target, update health display
-            // This requires dmg to have a target reference, which is not implemented here
-            // if (dmg.Target == _combatant) { UpdateHealthDisplay(); }
+            if (c == _combatant)
+            {
+                UpdateHealthDisplay(); // 更新血条和文字
+            }
         }));
-    } 
 
-    // 设置战斗者信息
-    public void SetCombatant(string name, int health, int maxHealth, Sprite avatarSprite)
+        // Update initial health display
+        Debug.Log("Binding combatant view for " + combatant.Name);
+        UpdateHealthDisplay(); // 更新血条和文字
+    }
+
+    // 更新血条与血量文字
+    private void UpdateHealthDisplay()
+    {
+        if (_combatant == null) return;
+
+        double health = _combatant.CurHP;
+        double maxHealth = _combatant.MaxHP;
+
+        if (healthText != null)
+            healthText.text = $"{health}/{maxHealth}";
+
+        if (healthBar != null)
+        {
+            double ratio = maxHealth > 0 ? health / maxHealth : 0;
+            StopAllCoroutines();
+            StartCoroutine(SmoothHealthBar((float)ratio));
+        }
+    }
+
+    // 平滑动画更新血条宽度
+    private IEnumerator SmoothHealthBar(float targetRatio)
+    {
+        float start = _displayedHealthRatio;
+        float elapsed = 0f;
+        float duration = 0.3f; // 动画时间（秒）
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            _displayedHealthRatio = Mathf.Lerp(start, targetRatio, t);
+            healthBar.transform.localScale = new Vector3(_displayedHealthRatio, 1f, 1f);
+            yield return null;
+        }
+
+        _displayedHealthRatio = targetRatio;
+        healthBar.transform.localScale = new Vector3(_displayedHealthRatio, 1f, 1f);
+    }
+
+    // 初始化战斗者信息
+    public void SetCombatant(string name, double health, double maxHealth, Sprite avatarSprite)
     {
         if (nameText != null) nameText.text = name;
         if (healthText != null) healthText.text = $"{health}/{maxHealth}";
@@ -50,8 +94,9 @@ public class CombatantView : MonoBehaviour
 
         if (healthBar != null)
         {
-            float healthRatio = maxHealth > 0 ? (float)health / maxHealth : 0f;
-            healthBar.transform.localScale = new Vector3(healthRatio, 1f, 1f);
+            double ratio = maxHealth > 0 ? health / maxHealth : 0;
+            _displayedHealthRatio = (float)ratio;
+            healthBar.transform.localScale = new Vector3(_displayedHealthRatio, 1f, 1f);
         }
     }
 
@@ -66,14 +111,11 @@ public class CombatantView : MonoBehaviour
 
         transform.localScale = scale;
 
-        // make sure the combatant is rendered above others when selected
-        // Z 坐标偏移实现置顶
         Vector3 pos = transform.localPosition;
-        pos.z = selected ? -1f : 0f;  // 负 Z 靠近相机，高于 0 的其他物体
+        pos.z = selected ? -1f : 0f;
         transform.localPosition = pos;
     }
 
-    // 显示 wrapper（保持默认显示）
     public void ShowWrapper(bool show)
     {
         gameObject.SetActive(show);
