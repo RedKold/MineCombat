@@ -33,7 +33,7 @@ public class Test : MonoBehaviour
             dmg.AddModifier("mc_peek", DamageModifiers.CreateMulTotal, 0.5, 16, "mc_bypass_test");
             dmg.AddModifier("mc_peek", DamageModifiers.CreateMulTotal, 0.5, 16, "mc_bypass_test");
             dmg.AddModifier("mc_mid", DamageModifiers.CreateAdd, 11, 12);
-            dmg.AddModifier("mc_custom", DamageModifiers.CreateCustom((ref double d) => { d *= 0.5; }, 14));
+            dmg.AddModifier("mc_custom", DamageModifiers.CreateCustom, (ref double d) => { d *= 0.5; }, 14);
         });
 
         Debug.Log($"mc_fortune:{properties.GetInt("mc_fortune")}");
@@ -41,5 +41,10 @@ public class Test : MonoBehaviour
         Debug.Log($"mc_name:{properties.GetString("mc_name")}");
         Debug.Log($"mc_load:{properties.GetBool("mc_load")}");
         Debug.Log($"mc_damage1:{properties.Get<Damage>("mc_damage1")?.Get()}");
+
+        Entity entity = new(60.0);
+        entity.ChangeHealth((ref double d) => { d *= 0.75; });
+        entity.ApplyDamage(11.8);
+        Debug.Log($"Health: {entity.GetHealth()}, Alive: {entity.IsAlive()}");
     }
 }
