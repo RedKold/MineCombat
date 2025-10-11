@@ -1,72 +1,65 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace MineCombat
 {
-    public class DamageModifier
+    public static class DamageModifiers
     {
-        internal enum Type { ADD, MUL }
+        public readonly static TagsManager Tags = new();
 
-        internal readonly Type type;
-        internal readonly uint priority;
-        internal ITags tags;
-        private double _value;
-
-        internal DamageModifier(Type type, double value, uint priority, ITags tags)
+        static DamageModifiers()
         {
-            this.type = type;
-            _value = value;
-            this.priority = priority;
-            this.tags = tags;
+
         }
 
-        public static DamageModifier CreateAdd(double value, uint priority, ITags tags)
+        public static DamageModifierAdd CreateAdd(double value, uint priority, ITags tags)
         {
-            return new DamageModifier(Type.ADD, value, priority, tags);
+            return new DamageModifierAdd(value, priority, tags);
+        }
+        public static DamageModifierAdd CreateAdd(double value, uint priority)
+        {
+            return new DamageModifierAdd(value, priority, StaticTags.Empty);
         }
 
-        public static DamageModifier CreateMul(double value, uint priority, ITags tags)
+        public static DamageModifierMul CreateMul(double value, uint priority, ITags tags)
         {
-            return new DamageModifier(Type.MUL, value, priority, tags);
+            return new DamageModifierMul(value, priority, tags);
+        }
+        public static DamageModifierMul CreateMul(double value, uint priority)
+        {
+            return new DamageModifierMul(value, priority, StaticTags.Empty);
         }
 
-        //此修改器是否忽略该类型的伤害
-        internal bool Ignore(string dmgid)
+        public static DamageModifierMulTotal CreateMulTotal(double value, uint priority, ITags tags)
         {
-            return DamageTypes.Ignore(dmgid, tags);
+            return new DamageModifierMulTotal(value, priority, tags);
+        }
+        public static DamageModifierMulTotal CreateMulTotal(double value, uint priority)
+        {
+            return new DamageModifierMulTotal(value, priority, StaticTags.Empty);
         }
 
-        internal bool TryMerge(DamageModifier mdf)
+        public static DamageModifierCustom CreateCustom(Process<double> processer, uint priority, ITags tags)
         {
-            if (mdf.type == type && mdf.priority == priority)
-            {
-                _value += mdf._value;
-                return true;
-            }
-            else 
-                return false;
+            return new DamageModifierCustom(processer, priority, tags);
         }
-        internal void Process(ref double damage)
+        public static DamageModifierCustom CreateCustom(Process<double> processer, uint priority)
         {
-            switch (type)
-            {
-                case Type.ADD: damage += _value; break;
-                case Type.MUL: damage *= Math.Max(0, (1 + _value)); break;
-            }
+            return new DamageModifierCustom(processer, priority, StaticTags.Empty);
         }
     }
 
     public class Damage
     {
-        public readonly string type;
-        public double value;
-        private Dictionary<string, DamageModifier> _modifiers;
+#nullable enable
+        internal readonly string type;
+        internal double value;
+        private Dictionary<string, IModifier<Damage>> _modifiers;
 
-        internal Damage(string type, float value, Dictionary<string, DamageModifier>? modifiers = null)
+        internal Damage(string type, float value, Dictionary<string, IModifier<Damage>>? modifiers = null)
         {
             this.type = type;
             this.value = value;
@@ -74,10 +67,22 @@ namespace MineCombat
         }
 
         //添加、合并或替换
-        internal void AddModifier(string mdfid, DamageModifier mdf)
+        internal void AddModifier(string mdfid, Modifier<Damage> mdf, bool replaceTags = true, bool mergeTags = false)
         {
-            if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(mdf)))
+            if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(mdf, replaceTags, mergeTags)))
                 _modifiers[mdfid] = mdf;
+        }
+        //该方法只能沿用最初的tags；它是性能优化版，视情况选择是否将字符串转为Tags，减少开销，适合只少量创建的可合并modifiers
+        internal void AddModifier(string mdfid, Func<double, uint, ITags, DamageModifier> creator, double value, uint priority, string? tags = null)
+        {
+            if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(creator(value, priority, StaticTags.Empty), false, false)))
+                _modifiers[mdfid] = creator(value, priority, tags is not null ? (Tags)tags : StaticTags.Empty);
+        }
+
+        //添加或替换
+        internal void UpdateModifier(string mdfid, Modifier<Damage> mdf)
+        {
+            _modifiers[mdfid] = mdf;
         }
 
         internal bool RemoveModifier(string mdfid)
@@ -88,20 +93,21 @@ namespace MineCombat
         internal double Get()
         {
             EventManager.Trigger("DamageProcess", this);
-            List<DamageModifier> modifiers = _modifiers.Values.ToList();
-            modifiers.Sort((x, y) => x.priority.CompareTo(y.priority));
+            List<IModifier<Damage>> modifiers = _modifiers.Values.ToList();
+            modifiers.Sort((x, y) => x.CompareTo(y));
             double value = this.value;
             foreach (var mdf in modifiers)
             {
-                if (!mdf.Ignore(type))
-                    mdf.Process(ref value);
+                mdf.Process(this);
             }
-            return value;
+            double result = this.value;
+            this.value = value;
+            return result;
         }
+#nullable disable
     }
 
-
-    public static class DamageTypes 
+    public static class DamageTags 
     {
         private static TagsManager types_tags_table = new();
 
@@ -115,9 +121,9 @@ namespace MineCombat
             return types_tags_table.Match(type, tag);
         }
 
-        static DamageTypes()
+        static DamageTags()
         {
-            types_tags_table.Add("mc_magic", (StaticTags)"{mc_bypass_armor, mc_bypass_test}");
+            types_tags_table.AddorMerge("mc_magic", (StaticTags)"{mc_bypass_armor, mc_bypass_test}");
         }
     }
 }
