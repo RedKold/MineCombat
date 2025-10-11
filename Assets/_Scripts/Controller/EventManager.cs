@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -83,6 +83,7 @@ namespace MineCombat
                 _parasName = type.Name;
             }
         }
+        internal Event() : this(x => { }) { }
 
         //利用反射包装dlg使其能够接收元组作为参数
         private Action<T>? TryTransfer(Delegate dlg)

@@ -12,17 +12,22 @@ namespace MineCombat
         private bool _alive = true;
         private object _lock = new();
 
-        internal Entity(double maxHealth)
-        {
-            _maxHealth = Math.Max(1, maxHealth);
-            _health = _maxHealth;
-        }
+        protected ITags tags;
 
-        internal Entity(double maxHealth, double health)
+        internal Entity(double maxHealth, ITags tags)
         {
-            _maxHealth = Math.Max(1, maxHealth);
-            _health = Math.Min(_maxHealth, Math.Max(1, health));
+            _maxHealth = Math.Min(uint.MaxValue, Math.Max(1, maxHealth));
+            _health = _maxHealth;
+            this.tags = tags;
         }
+        internal Entity(double maxHealth, double health, ITags tags)
+        {
+            _maxHealth = Math.Min(uint.MaxValue, Math.Max(1, maxHealth));
+            _health = Math.Min(_maxHealth, Math.Max(1, health));
+            this.tags = tags;
+        }
+        internal Entity(double maxHealth) : this(maxHealth, StaticTags.Empty) { }
+        internal Entity(double maxHealth, double health) : this(maxHealth, health, StaticTags.Empty) { }
 
         public double GetMaxHealth()
         {
@@ -38,7 +43,7 @@ namespace MineCombat
         {
             lock (_lock)
             {
-                _maxHealth = Math.Max(1, maxHealth);
+                _maxHealth = Math.Min(uint.MaxValue, Math.Max(1, maxHealth));
                 _health = Math.Min(_health, _maxHealth);
             }
         }
@@ -61,7 +66,7 @@ namespace MineCombat
             lock (_lock)
             {
                 process(ref _maxHealth);
-                _maxHealth = Math.Max(1, _maxHealth);
+                _maxHealth = Math.Min(uint.MaxValue, Math.Max(1, _maxHealth));
                 _health = Math.Min(_health, _maxHealth);
             }
         }
@@ -80,7 +85,7 @@ namespace MineCombat
             }
         }
 
-        public void ApplyDamage(double damage)
+        public bool ApplyDamage(double damage)
         {
             lock (_lock)
             {
@@ -88,8 +93,10 @@ namespace MineCombat
                 if (_health <= 0)
                 {
                     _alive = false;
+                    Die();
                     _health = 0;
                 }
+                return _alive;
             }
         }
 
@@ -103,7 +110,13 @@ namespace MineCombat
             lock (_lock)
             {
                 _alive = alive;
+                if (alive)
+                    Revive();
+                else Die();
             }
         }
+
+        public virtual void Die() { }
+        public virtual void Revive() { }
     }
 }
