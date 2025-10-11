@@ -23,9 +23,9 @@ namespace MineCombat
         public readonly bool Xcost;
         public readonly Rarity rarity;
         public readonly ITags tags;
-        public readonly Action? action;
+        public readonly Action<Card>? action;
 
-        internal Card(byte cost, bool Xcost, Rarity rarity, ITags tags, Action? action = null)
+        internal Card(byte cost, bool Xcost, Rarity rarity, ITags tags, Action<Card>? action = null)
         {
             this.cost = cost;
             this.Xcost = Xcost;

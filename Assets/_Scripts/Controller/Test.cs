@@ -4,47 +4,56 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
+    private class Creeper : Entity
+    {
+        public Creeper(ITags tags) : base(20.0, tags) { }
+
+        public override void Die()
+        {
+            Debug.Log("Creeper is dead!");
+        }
+    }
+
     public void Start()
     {
-        Damage damage1 = new("mc_common", 10);
-        Damage damage2 = new("mc_magic", 10);
+        Damage damage;
+        Creeper creeper = new Creeper((Tags)"mc_resistance");
+        creeper.Update("mc_resistance_level", 3);
+
+        Card card = new Card(1, false, Rarity.Epic, StaticTags.Empty, card =>
+        {
+            double dmg = card.GetDouble("mc_attack_damage") ?? 0.0;
+            if (dmg > 0)
+            {
+                card.Store("mc_output", new Damage(creeper, "mc_common", dmg));
+                card.Store("mc_read_type", "mc_damage");
+            }
+        });
+        card.Store("mc_attack_damage", 65.0);
 
         EventManager.Bind("DamageProcess", new Action<Damage>(dmg =>
         {
-            if (!DamageTags.Ignore(dmg.type, "mc_bypass_armor"))
+            int rst_lvl = dmg.target.GetInt("mc_resistance_level") ?? 0;
+            dmg.AddModifier("modifier_mc_resistance", DamageModifiers.CreateCustom, (ref double d) =>
             {
-                dmg.value *= 0.5;
-            }
-            dmg.AddModifier("mc_test", DamageModifiers.CreateMul, 0.5, 10, "mc_bypass_test");
+                d *= (rst_lvl * 0.2);
+            }, 5, "mc_bypass_resistance");
         }));
 
-        Properties properties = new Properties();
-        properties.Store("mc_fortune", 3);
-        properties.Store("mc_attack_damage", 4.5);
-        properties.Update("mc_fortune", 6);
-        properties.Update("mc_name", "OftenOviour");
-        properties.Update("mc_load", true);
-        properties.Store("mc_damage1", damage1);
-        properties.Store("mc_damage2", damage2);
-
-        properties.Change("mc_attack_damage", (ref double d) => { d *= 2.5; });
-        properties.Change("mc_damage1", (ref Damage dmg) => { 
-            dmg.AddModifier("mc_test", DamageModifiers.CreateMul, 0.3, 10, "mc_bypass_test");
-            dmg.AddModifier("mc_peek", DamageModifiers.CreateMulTotal, 0.5, 16, "mc_bypass_test");
-            dmg.AddModifier("mc_peek", DamageModifiers.CreateMulTotal, 0.5, 16, "mc_bypass_test");
-            dmg.AddModifier("mc_mid", DamageModifiers.CreateAdd, 11, 12);
-            dmg.AddModifier("mc_custom", DamageModifiers.CreateCustom, (ref double d) => { d *= 0.5; }, 14);
-        });
-
-        Debug.Log($"mc_fortune:{properties.GetInt("mc_fortune")}");
-        Debug.Log($"mc_attack_damage:{properties.GetDouble("mc_attack_damage")}");
-        Debug.Log($"mc_name:{properties.GetString("mc_name")}");
-        Debug.Log($"mc_load:{properties.GetBool("mc_load")}");
-        Debug.Log($"mc_damage1:{properties.Get<Damage>("mc_damage1")?.Get()}");
-
-        Entity entity = new(60.0);
-        entity.ChangeHealth((ref double d) => { d *= 0.75; });
-        entity.ApplyDamage(11.8);
-        Debug.Log($"Health: {entity.GetHealth()}, Alive: {entity.IsAlive()}");
+        card.action(card);
+        string? type = card.GetString("mc_read_type");
+        if (type is not null)
+        {
+            switch (type)
+            {
+                case "mc_damage":
+                    Damage rldmg = card.Get<Damage>("mc_output");
+                    if (rldmg is not null)
+                    {
+                        Debug.Log($"Creeper surfers {rldmg.Get()} damages.");
+                    }
+                    break;
+            }
+        }
     }
 }

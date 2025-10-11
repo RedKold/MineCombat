@@ -54,14 +54,17 @@ namespace MineCombat
 
     public class Damage
     {
+        internal readonly Entity target;
+
 #nullable enable
         internal readonly string type;
-        protected double value;
+        internal double value;
         private Dictionary<string, IModifier<Damage>> _modifiers;
         protected object _lock = new();
 
-        internal Damage(string type, float value, Dictionary<string, IModifier<Damage>>? modifiers = null)
+        internal Damage(Entity target, string type, double value, Dictionary<string, IModifier<Damage>>? modifiers = null)
         {
+            this.target = target;
             this.type = type;
             this.value = value;
             _modifiers = modifiers?.Any() == true ? modifiers : new();
@@ -77,7 +80,14 @@ namespace MineCombat
             }
         }
         //该方法只能沿用最初的tags；它是性能优化版，视情况选择是否将字符串转为Tags，减少开销，适合只少量创建的可合并modifiers
-        internal void AddModifier(string mdfid, Func<double, uint, ITags, DamageModifier> creator, double value, uint priority, string? tags = null)
+        internal void AddModifier(string mdfid, Func<Process<double>, uint, ITags, DamageModifier> creator, Process<double> processer, uint priority, string? tags = null)
+        {
+            lock (_lock)
+            {
+                _modifiers[mdfid] = creator(processer, priority, tags is not null ? (Tags)tags : StaticTags.Empty);
+            }
+        }
+        internal void AddModifier<T>(string mdfid, Func<T, uint, ITags, DamageModifier> creator, T value, uint priority, string? tags = null) where T : notnull
         {
             lock (_lock)
             {
@@ -111,6 +121,7 @@ namespace MineCombat
                     mdf.Process(this);
                 }
                 result = this.value;
+                target.ApplyDamage(result);
                 this.value = value;
             }
             return result;
