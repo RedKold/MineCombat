@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -158,7 +158,9 @@ namespace MineCombat
 
         static EventManager()
         {
-            events.Add("DamageProcess", new Event<Damage>(x => { x.value += 5; }));
+            events.Add("DamageProcess", new Event<Damage>(x => { }));
+            events.Add("CombatantDied", new Event<Combatant>(x => { }));
+            events.Add("HealthChanged", new Event<Combatant>(x => { }));
         }
     }
 }

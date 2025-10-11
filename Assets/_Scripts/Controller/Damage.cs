@@ -143,6 +143,7 @@ namespace MineCombat
             return types_tags_table.Match(type, tag);
         }
 
+        //预定义类型和标签 
         static DamageTags()
         {
             types_tags_table.AddorMerge("mc_magic", (StaticTags)"{mc_bypass_armor, mc_bypass_test}");
