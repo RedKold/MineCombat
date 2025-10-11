@@ -83,6 +83,7 @@ namespace MineCombat
                 _parasName = type.Name;
             }
         }
+        internal Event() : this(x => { }) { }
 
         //利用反射包装dlg使其能够接收元组作为参数
         private Action<T>? TryTransfer(Delegate dlg)
@@ -157,7 +158,7 @@ namespace MineCombat
 
         static EventManager()
         {
-            events.Add("DamageProcess", new Event<Damage>(x => { }));
+            events.Add("DamageProcess", new Event<Damage>(x => { x.value += 5; }));
         }
     }
 }

@@ -20,11 +20,11 @@ namespace MineCombat
     public class Tag : ITag 
     {
 #nullable enable
-        public readonly string _tag;
+        public readonly string tag;
 
         public Tag(string tag)
         {
-            _tag = tag;
+            this.tag = tag;
         }
 
         public bool Equals(ITag? other)
@@ -33,7 +33,7 @@ namespace MineCombat
                 return true;
 
             if (other is Tag otherTag)
-                return _tag.Equals(otherTag._tag);
+                return tag.Equals(otherTag.tag);
             return false;
         }
         public override bool Equals(object? obj)
@@ -46,26 +46,26 @@ namespace MineCombat
 
         public bool Contains(string tag)
         {
-            return _tag.Equals(tag);
+            return this.tag.Equals(tag);
         }
 
         public bool ContainedBy(ITags tags)
         {
-            return tags.Contains(_tag);
+            return tags.Contains(tag);
         }
 
         public HashSet<string>? ToHashSet()
         {
-            return new HashSet<string> { _tag };
+            return new HashSet<string> { tag };
         }
 
         public override int GetHashCode()
         {
-            return _tag.GetHashCode();
+            return tag.GetHashCode();
         }
         public override string ToString()
         {
-            return _tag;
+            return tag;
         }
 
         public static implicit operator Tag(string tag) => new Tag(tag);
@@ -75,7 +75,7 @@ namespace MineCombat
     public class TagSet : ITag
     {
 #nullable enable
-        protected readonly HashSet<string>? _tags;
+        private readonly HashSet<string>? _tags;
 
         public TagSet(IEnumerable<string>? tags = null)
         {
@@ -167,7 +167,7 @@ namespace MineCombat
         public static readonly StaticTags Empty = new StaticTags();
 
 #nullable enable
-        protected readonly HashSet<string>? _tags;
+        private readonly HashSet<string>? _tags;
 
         public StaticTags(params string[] tags)
         {
@@ -241,11 +241,12 @@ namespace MineCombat
     public class Tags : ITags
     {
 #nullable enable
-        protected List<ITag> _tags;
-        protected HashSet<string> _flatView;
-        protected bool _updated;
+        private List<ITag> _tags;
+        private HashSet<string> _flatView;
+        private bool _updated;
+        protected object _lock = new();
 
-        protected void BuildFlatView()
+        private void BuildFlatView()
         {
             if (_updated) 
                 return;
@@ -331,50 +332,60 @@ namespace MineCombat
                 return true;
 
             if (other is Tags otherTags)
-                return new HashSet<ITag>(_tags).SetEquals(otherTags._tags);
+                lock (_lock) { return new HashSet<ITag>(_tags).SetEquals(otherTags._tags); }
             return false;
         }
 
         public bool Contains(string tag)
         {
-            BuildFlatView();
-            return _flatView.Contains(tag);
+            lock (_lock)
+            {
+                BuildFlatView();
+                return _flatView.Contains(tag);
+            }
         }
 
         public bool Match(ITags target)
         {
-            foreach (var tag in _tags)
+            lock (_lock)
             {
-                if (target.Contains(tag))
-                    return true;
+                foreach (var tag in _tags)
+                {
+                    if (target.Contains(tag))
+                        return true;
+                }
+                return false;
             }
-            return false;
         }
 
         HashSet<ITag> ITags.ToHashSet()
         {
-            return new HashSet<ITag>(_tags);
+            lock (_lock) { return new HashSet<ITag>(_tags); }
         }
 
         public bool Add(ITag tag)
         {
-            bool result = !_tags.Contains(tag);
-            if (result)
+            lock (_lock)
             {
-                _tags.Add(tag);
-                if (_updated)
+                bool result = !_tags.Contains(tag);
+                if (result)
                 {
-                    HashSet<string>? flatView = tag.ToHashSet();
-                    if (flatView is not null)
-                        _flatView.UnionWith(flatView);
+                    _tags.Add(tag);
+                    if (_updated)
+                    {
+                        HashSet<string>? flatView = tag.ToHashSet();
+                        if (flatView is not null)
+                            _flatView.UnionWith(flatView);
+                    }
                 }
+                return result;
             }
-            return result;
         }
 
         public bool Remove(ITag tag)
         {
-            bool result = _tags.Remove(tag);
+            bool result;
+            lock (_lock) { result = _tags.Remove(tag); }
             if (result)
                 _updated = false;
             return result;
@@ -382,11 +393,14 @@ namespace MineCombat
 
         public Tags Merge(ITags other)
         {
-            HashSet<ITag> set = new HashSet<ITag>(_tags);
-            foreach(var tag in other.ToHashSet())
+            lock (_lock)
             {
-                if (!set.Contains(tag))
-                    _tags.Add(tag);
+                HashSet<ITag> set = new(_tags);
+                foreach (var tag in other.ToHashSet())
+                {
+                    if (!set.Contains(tag))
+                        _tags.Add(tag);
+                }
             }
             _updated = false;
             return this;
@@ -394,21 +408,24 @@ namespace MineCombat
         public Tags Exclude(ITags other)
         {
             HashSet<ITag> set = other.ToHashSet();
-            _tags.RemoveAll(tag => set.Contains(tag));
+            lock (_lock) { _tags.RemoveAll(tag => set.Contains(tag)); }
             _updated = false;
             return this;
         }
 
         public StaticTags GetStatic()
         {
-            BuildFlatView();
-            return new StaticTags(_flatView);
+            lock (_lock)
+            {
+                BuildFlatView();
+                return new StaticTags(_flatView);
+            }
         }
 
         public override string ToString()
         {
             if (_tags.Any())
-                return '{' + string.Join(',', _tags) + '}';
+                lock (_lock) { return '{' + string.Join(',', _tags) + '}'; }
             else return "{}";
         }
 
@@ -427,62 +444,75 @@ namespace MineCombat
     public class TagsManager
     {
 #nullable enable
-        protected Dictionary<string, ITags> _tagsTable;
+        protected Dictionary<string, ITags> _tagsTable = new();
+        protected object _lock = new();
 
-        public TagsManager() { _tagsTable = new(); }
+        public TagsManager() { }
 
         public void Set(string id, ITags tags)
         {
-            _tagsTable[id] = tags;
+            lock(_lock) { _tagsTable[id] = tags; }
         }
 
         public bool Add(string id, ITags tags)
         {
-            return _tagsTable.TryAdd(id, tags);
+            lock (_lock) { return _tagsTable.TryAdd(id, tags); }
         }
 
         //静态标签集合拒绝任何修改，但允许外部用户操作普通标签集合
         public bool AddorMerge(string id, ITags ntags)
         {
-            if (_tagsTable.TryGetValue(id, out var otags))
+            lock (_lock)
             {
-                if (otags is Tags tags)
-                { 
-                    tags.Merge(ntags);
+                if (_tagsTable.TryGetValue(id, out var otags))
+                {
+                    if (otags is Tags tags)
+                    {
+                        tags.Merge(ntags);
+                        return true;
+                    }
+                    return false;
+                }
+                else
+                {
+                    _tagsTable[id] = ntags;
                     return true;
                 }
-                return false;
-            }
-            else
-            {
-                _tagsTable[id] = ntags;
-                return true;
             }
         }
 
         public ITags? Get(string id)
         {
-            if (_tagsTable.TryGetValue(id, out var tags))
-                return tags;
+            lock (_lock)
+            {
+                if (_tagsTable.TryGetValue(id, out var tags))
+                    return tags;
+            }
             return null;
         }
 
         public bool Remove(string id, ITags ntags)
         {
-            if (_tagsTable.TryGetValue(id, out var otags) && otags is Tags tags)
+            lock (_lock)
             {
-                tags.Exclude(ntags);
-                return true;
+                if (_tagsTable.TryGetValue(id, out var otags) && otags is Tags tags)
+                {
+                    tags.Exclude(ntags);
+                    return true;
+                }
             }
             return false;
         }
 
         public bool Delete(string id)
         {
-            if (_tagsTable.TryGetValue(id, out var otags))
+            lock (_lock)
             {
-                _tagsTable.Remove(id); 
-                return true;
+                if (_tagsTable.TryGetValue(id, out var otags))
+                {
+                    _tagsTable.Remove(id);
+                    return true;
+                }
             }
             return false;
         }
@@ -490,15 +520,21 @@ namespace MineCombat
         //目标标签集合的扁平化集合中至少包含src的一个完整子集
         public bool Match(string id, ITags src)
         {
-            if (_tagsTable.TryGetValue(id, out var tags))
-                return src.Match(tags);
+            lock (_lock)
+            {
+                if (_tagsTable.TryGetValue(id, out var tags))
+                    return src.Match(tags);
+            }
             return false;
         }
 
         public bool Match(string id, string src)
         {
-            if (_tagsTable.TryGetValue(id, out var tags))
-                return tags.Contains(src);
+            lock (_lock)
+            {
+                if (_tagsTable.TryGetValue(id, out var tags))
+                    return tags.Contains(src);
+            }
             return false;
         }
     }

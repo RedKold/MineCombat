@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -21,6 +20,7 @@ namespace MineCombat
 #nullable enable
         protected uint priority;
         protected ITags tags;
+        protected object _lock = new();
 
         protected Modifier(uint priority, ITags tags)
         {
@@ -81,15 +81,18 @@ namespace MineCombat
         {
             if (rmdf is DamageModifierAdd mdf && mdf.priority == priority)
             {
-                if (replaceTags)
+                lock (_lock)
                 {
-                    if (mergeTags && tags is Tags t)
-                        t.Merge(mdf.tags);
-                    else
-                        tags = mdf.tags;
+                    if (replaceTags)
+                    {
+                        if (mergeTags && tags is Tags t)
+                            t.Merge(mdf.tags);
+                        else
+                            tags = mdf.tags;
+                    }
+                    _value += mdf._value;
+                    return true;
                 }
-                _value += mdf._value;
-                return true;
             }
             else
                 return false;
@@ -121,15 +124,18 @@ namespace MineCombat
         {
             if (rmdf is DamageModifierMul mdf && mdf.priority == priority)
             {
-                if (replaceTags)
+                lock (_lock)
                 {
-                    if (mergeTags && tags is Tags t)
-                        t.Merge(mdf.tags);
-                    else
-                        tags = mdf.tags;
+                    if (replaceTags)
+                    {
+                        if (mergeTags && tags is Tags t)
+                            t.Merge(mdf.tags);
+                        else
+                            tags = mdf.tags;
+                    }
+                    _value = Math.Max(-1, _value + mdf._value);
+                    return true;
                 }
-                _value = Math.Max(-1, _value + mdf._value);
-                return true;
             }
             else
                 return false;
@@ -161,15 +167,18 @@ namespace MineCombat
         {
             if (rmdf is DamageModifierMulTotal mdf && mdf.priority == priority)
             {
-                if (replaceTags)
+                lock (_lock)
                 {
-                    if (mergeTags && tags is Tags t)
-                        t.Merge(mdf.tags);
-                    else
-                        tags = mdf.tags;
+                    if (replaceTags)
+                    {
+                        if (mergeTags && tags is Tags t)
+                            t.Merge(mdf.tags);
+                        else
+                            tags = mdf.tags;
+                    }
+                    _value = Math.Max(-1, (1 + _value) * (1 + mdf._value) - 1);
+                    return true;
                 }
-                _value = Math.Max(-1, (1 + _value) * (1 + mdf._value) - 1);
-                return true;
             }
             else
                 return false;

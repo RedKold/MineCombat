@@ -56,8 +56,9 @@ namespace MineCombat
     {
 #nullable enable
         internal readonly string type;
-        internal double value;
+        protected double value;
         private Dictionary<string, IModifier<Damage>> _modifiers;
+        protected object _lock = new();
 
         internal Damage(string type, float value, Dictionary<string, IModifier<Damage>>? modifiers = null)
         {
@@ -69,50 +70,55 @@ namespace MineCombat
         //添加、合并或替换
         internal void AddModifier(string mdfid, Modifier<Damage> mdf, bool replaceTags = true, bool mergeTags = false)
         {
-            if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(mdf, replaceTags, mergeTags)))
-                _modifiers[mdfid] = mdf;
+            lock (_lock)
+            {
+                if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(mdf, replaceTags, mergeTags)))
+                    _modifiers[mdfid] = mdf;
+            }
         }
         //该方法只能沿用最初的tags；它是性能优化版，视情况选择是否将字符串转为Tags，减少开销，适合只少量创建的可合并modifiers
         internal void AddModifier(string mdfid, Func<double, uint, ITags, DamageModifier> creator, double value, uint priority, string? tags = null)
         {
-            if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(creator(value, priority, StaticTags.Empty), false, false)))
-                _modifiers[mdfid] = creator(value, priority, tags is not null ? (Tags)tags : StaticTags.Empty);
-        }
-        internal void AddModifier(string mdfid, Func<Process<double>, uint, ITags, DamageModifier> creator, Process<double> value, uint priority, string? tags = null)
-        {
-            if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(creator(value, priority, StaticTags.Empty), false, false)))
-                _modifiers[mdfid] = creator(value, priority, tags is not null ? (Tags)tags : StaticTags.Empty);
+            lock (_lock)
+            {
+                if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(creator(value, priority, StaticTags.Empty), false, false)))
+                    _modifiers[mdfid] = creator(value, priority, tags is not null ? (Tags)tags : StaticTags.Empty);
+            }
         }
 
         //添加或替换
         internal void UpdateModifier(string mdfid, Modifier<Damage> mdf)
         {
-            _modifiers[mdfid] = mdf;
+            lock (_lock) { _modifiers[mdfid] = mdf; }
         }
 
         internal bool RemoveModifier(string mdfid)
         {
-            return _modifiers.Remove(mdfid);
+            lock (_lock) { return _modifiers.Remove(mdfid); }
         }
 
         internal double Get()
         {
-            EventManager.Trigger("DamageProcess", this);
-            List<IModifier<Damage>> modifiers = _modifiers.Values.ToList();
-            modifiers.Sort((x, y) => x.CompareTo(y));
-            double value = this.value;
-            foreach (var mdf in modifiers)
+            double value, result;
+            lock (_lock)
             {
-                mdf.Process(this);
+                value = this.value;
+                EventManager.Trigger("DamageProcess", this);
+                List<IModifier<Damage>> modifiers = _modifiers.Values.ToList();
+                modifiers.Sort((x, y) => x.CompareTo(y));
+                foreach (var mdf in modifiers)
+                {
+                    mdf.Process(this);
+                }
+                result = this.value;
+                this.value = value;
             }
-            double result = this.value;
-            this.value = value;
             return result;
         }
 #nullable disable
     }
 
-    public static class DamageTags 
+    public static class DamageTags
     {
         private static TagsManager types_tags_table = new();
 

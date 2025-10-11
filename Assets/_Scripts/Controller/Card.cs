@@ -1,31 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace MineCombat
 {
+    public enum Rarity : byte
+    {
+        [Description("普通")] Common = 0,
+        [Description("不凡")] Uncommon = 1,
+        [Description("稀有")] Rare = 2,
+        [Description("史诗")] Epic = 3,
+        [Description("传说")] Legend = 4,
+        [Description("唯一")] Unique = 5
+    }
+
     public sealed class Card : Properties
     {
-        public enum Rarity 
-        { 
-            COMMON = (ushort)0,
-            UNCOMMON = (ushort)1,
-            RARE = (ushort)2,
-            EPIC = (ushort)3,
-            LEGEND = (ushort)4,
-            UNIQUE = (ushort)5
-        }
-
-        public readonly short cost;
+#nullable enable
+        public readonly byte cost;
+        public readonly bool Xcost;
         public readonly Rarity rarity;
-        public readonly Action action;
+        public readonly ITags tags;
+        public readonly Action? action;
 
-        internal Card(short cost, Rarity rarity, Action action)
+        internal Card(byte cost, bool Xcost, Rarity rarity, ITags tags, Action? action = null)
         {
             this.cost = cost;
+            this.Xcost = Xcost;
             this.rarity = rarity;
+            this.tags = tags;
             this.action = action;
         }
+
+        internal Card(byte cost, bool Xcost, Rarity rarity) : this(cost, Xcost, rarity, StaticTags.Empty) { }
+#nullable disable
     }
 }
