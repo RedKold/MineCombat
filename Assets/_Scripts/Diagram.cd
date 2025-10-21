@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MineCombat.Actions" Collapsed="true">
+    <Position X="1" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAABAAAAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MineCombat.Actions&lt;T&gt;" Collapsed="true">
+    <Position X="2.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAQAABAAAAAAAAQAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MineCombat.AConstPriorityEvent" Collapsed="true">
+    <Position X="6.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MineCombat.AConstSlicedEvent" Collapsed="true">
+    <Position X="1.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAgAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MineCombat.AConstRandomEvent" Collapsed="true">
+    <Position X="1.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAgIAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MineCombat.PriorityEvent" Collapsed="true">
+    <Position X="1" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAAgAAAAIAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MineCombat.PriorityEvent&lt;T&gt;" Collapsed="true">
+    <Position X="2.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAAgAAAAIAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MineCombat.SlicedEvent" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IIAAgAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="MineCombat.SlicedEvent&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IIAAgAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="MineCombat.RandomEvent" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAgIAAAAAAAAAAAAAAAAAIABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="MineCombat.RandomEvent&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAgIAAAAAAAAAAAAAAAAAIABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="MineCombat.ConstPriorityEvent" Collapsed="true">
+    <Position X="5.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MineCombat.ConstPriorityEvent&lt;T&gt;" Collapsed="true">
+    <Position X="7.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MineCombat.ConstSlicedEvent" Collapsed="true">
+    <Position X="0.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MineCombat.ConstSlicedEvent&lt;T&gt;" Collapsed="true">
+    <Position X="2.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MineCombat.ConstRandomEvent" Collapsed="true">
+    <Position X="0.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MineCombat.ConstRandomEvent&lt;T&gt;" Collapsed="true">
+    <Position X="2.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MineCombat.Events&lt;I, A&gt;" Collapsed="true">
+    <Position X="7.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CEIEAAAAAAAAAAAACAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MineCombat.EventManager">
+    <Position X="6" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAggQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="MineCombat.IEvent" Collapsed="true">
+    <Position X="4" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MineCombat.IConstable&lt;T&gt;" Collapsed="true">
+    <Position X="2" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MineCombat.IPriorityEvent" Collapsed="true">
+    <Position X="1" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MineCombat.ISlicedEvent" Collapsed="true">
+    <Position X="3" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="MineCombat.IRandomEvent" Collapsed="true">
+    <Position X="5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\_Scripts\Controller\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

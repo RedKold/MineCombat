@@ -9,20 +9,20 @@ namespace MineCombat
 
     public interface IModifier<T> : IComparable<IModifier<T>>
     {
-        public int Class();
-        public void Process(ref T t);
-        public void Process(T t);
-        public bool TryMerge(IModifier<T> mdf, bool replaceTags = true, bool mergeTags = false);
+        int Class();
+        void Process(ref T t);
+        void Process(T t);
+        bool TryMerge(IModifier<T> mdf, bool replaceTags = true, bool mergeTags = false);
     }
 
     abstract public class Modifier<T> : IModifier<T>
     {
 #nullable enable
-        protected uint priority;
+        protected int priority;
         protected ITags tags;
         protected object _lock = new();
 
-        protected Modifier(uint priority, ITags tags)
+        protected Modifier(int priority, ITags tags)
         {
             this.priority = priority;
             this.tags = tags;
@@ -35,7 +35,7 @@ namespace MineCombat
             if (other is null)
                 return 1;
             if (other is Modifier<T> co)
-                return (int)priority - (int)co.priority;
+                return priority - co.priority;
             return 65793 - other.Class();
         }
 
@@ -48,7 +48,7 @@ namespace MineCombat
 
     public class DamageModifier : Modifier<Damage>
     {
-        internal DamageModifier(uint priority, ITags tags) : base(priority, tags) { }
+        internal DamageModifier(int priority, ITags tags) : base(priority, tags) { }
 
         public override bool Ignore(Damage t)
         {
@@ -60,7 +60,7 @@ namespace MineCombat
     {
         private double _value;
 
-        internal DamageModifierAdd(double value, uint priority, ITags tags) : base(priority, tags)
+        internal DamageModifierAdd(double value, int priority, ITags tags) : base(priority, tags)
         {
             _value = value;
         }
@@ -103,7 +103,7 @@ namespace MineCombat
     {
         private double _value;
 
-        internal DamageModifierMul(double value, uint priority, ITags tags) : base(priority, tags)
+        internal DamageModifierMul(double value, int priority, ITags tags) : base(priority, tags)
         {
             _value = Math.Max(-1, value);
         }
@@ -146,7 +146,7 @@ namespace MineCombat
     {
         private double _value;
 
-        internal DamageModifierMulTotal(double value, uint priority, ITags tags) : base(priority, tags)
+        internal DamageModifierMulTotal(double value, int priority, ITags tags) : base(priority, tags)
         {
             _value = value;
         }
@@ -189,7 +189,7 @@ namespace MineCombat
     {
         private Process<double> _processer;
 
-        internal DamageModifierCustom(Process<double> processer, uint priority, ITags tags) : base(priority, tags)
+        internal DamageModifierCustom(Process<double> processer, int priority, ITags tags) : base(priority, tags)
         {
             _processer = processer;
         }

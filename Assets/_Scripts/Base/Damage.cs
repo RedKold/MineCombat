@@ -15,40 +15,40 @@ namespace MineCombat
 
         }
 
-        public static DamageModifierAdd CreateAdd(double value, uint priority, ITags tags)
+        public static DamageModifierAdd CreateAdd(double value, int priority, ITags tags)
         {
             return new DamageModifierAdd(value, priority, tags);
         }
-        public static DamageModifierAdd CreateAdd(double value, uint priority)
+        public static DamageModifierAdd CreateAdd(double value, int priority)
         {
-            return new DamageModifierAdd(value, priority, StaticTags.Empty);
+            return new DamageModifierAdd(value, priority, ConstTags.Empty);
         }
 
-        public static DamageModifierMul CreateMul(double value, uint priority, ITags tags)
+        public static DamageModifierMul CreateMul(double value, int priority, ITags tags)
         {
             return new DamageModifierMul(value, priority, tags);
         }
-        public static DamageModifierMul CreateMul(double value, uint priority)
+        public static DamageModifierMul CreateMul(double value, int priority)
         {
-            return new DamageModifierMul(value, priority, StaticTags.Empty);
+            return new DamageModifierMul(value, priority, ConstTags.Empty);
         }
 
-        public static DamageModifierMulTotal CreateMulTotal(double value, uint priority, ITags tags)
+        public static DamageModifierMulTotal CreateMulTotal(double value, int priority, ITags tags)
         {
             return new DamageModifierMulTotal(value, priority, tags);
         }
-        public static DamageModifierMulTotal CreateMulTotal(double value, uint priority)
+        public static DamageModifierMulTotal CreateMulTotal(double value, int priority)
         {
-            return new DamageModifierMulTotal(value, priority, StaticTags.Empty);
+            return new DamageModifierMulTotal(value, priority, ConstTags.Empty);
         }
 
-        public static DamageModifierCustom CreateCustom(Process<double> processer, uint priority, ITags tags)
+        public static DamageModifierCustom CreateCustom(Process<double> processer, int priority, ITags tags)
         {
             return new DamageModifierCustom(processer, priority, tags);
         }
-        public static DamageModifierCustom CreateCustom(Process<double> processer, uint priority)
+        public static DamageModifierCustom CreateCustom(Process<double> processer, int priority)
         {
-            return new DamageModifierCustom(processer, priority, StaticTags.Empty);
+            return new DamageModifierCustom(processer, priority, ConstTags.Empty);
         }
     }
 
@@ -80,19 +80,19 @@ namespace MineCombat
             }
         }
         //该方法只能沿用最初的tags；它是性能优化版，视情况选择是否将字符串转为Tags，减少开销，适合只少量创建的可合并modifiers
-        internal void AddModifier(string mdfid, Func<Process<double>, uint, ITags, DamageModifier> creator, Process<double> processer, uint priority, string? tags = null)
+        internal void AddModifier(string mdfid, Func<Process<double>, int, ITags, DamageModifier> creator, Process<double> processer, int priority, string? tags = null)
         {
             lock (_lock)
             {
-                _modifiers[mdfid] = creator(processer, priority, tags is not null ? (Tags)tags : StaticTags.Empty);
+                _modifiers[mdfid] = creator(processer, priority, tags is not null ? (Tags)tags : ConstTags.Empty);
             }
         }
-        internal void AddModifier<T>(string mdfid, Func<T, uint, ITags, DamageModifier> creator, T value, uint priority, string? tags = null) where T : notnull
+        internal void AddModifier<T>(string mdfid, Func<T, int, ITags, DamageModifier> creator, T value, int priority, string? tags = null) where T : notnull
         {
             lock (_lock)
             {
-                if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(creator(value, priority, StaticTags.Empty), false, false)))
-                    _modifiers[mdfid] = creator(value, priority, tags is not null ? (Tags)tags : StaticTags.Empty);
+                if (!(_modifiers.ContainsKey(mdfid) && _modifiers[mdfid].TryMerge(creator(value, priority, ConstTags.Empty), false, false)))
+                    _modifiers[mdfid] = creator(value, priority, tags is not null ? (Tags)tags : ConstTags.Empty);
             }
         }
 
@@ -113,7 +113,6 @@ namespace MineCombat
             lock (_lock)
             {
                 value = this.value;
-                EventManager.Trigger("DamageProcess", this);
                 List<IModifier<Damage>> modifiers = _modifiers.Values.ToList();
                 modifiers.Sort((x, y) => x.CompareTo(y));
                 foreach (var mdf in modifiers)
@@ -145,7 +144,7 @@ namespace MineCombat
 
         static DamageTags()
         {
-            types_tags_table.AddorMerge("mc_magic", (StaticTags)"{mc_bypass_armor, mc_bypass_test}");
+            types_tags_table.AddorMerge("mc_magic", (ConstTags)"{mc_bypass_armor, mc_bypass_test}");
         }
     }
 }
