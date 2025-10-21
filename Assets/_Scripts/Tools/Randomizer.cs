@@ -149,10 +149,10 @@ namespace MineCombat
             _count = items.Length;
 
             if (_count != weights.Length)
-                throw new InvalidDataException("项数组与权重数组长度不相等");
+                throw new ArgumentException("项数组与权重数组长度不相等");
 
             if (_count == 0)
-                throw new InvalidDataException("不能使用空数组初始化");
+                throw new ArgumentException("不能使用空数组初始化");
 
             _items = items;
             _alias = new int[_count];
