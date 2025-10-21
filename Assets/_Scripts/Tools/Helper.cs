@@ -14,7 +14,16 @@ namespace MineCombat
             if (max <= min)
                 throw new ArgumentException("给出的取值上限不大于取值下限");
 
-            return ((((long)random.Next() << 32) | (long)random.Next()) % (max - min)) + min;
+            long range = max - min;
+            if (range <= int.MaxValue)
+                return random.Next((int)range) + min;
+
+            long result;
+            do
+            {
+                result = ((long)random.Next() << 32) | (long)random.Next(int.MinValue, int.MaxValue);
+            } while (result >= (long.MaxValue - long.MaxValue % range));
+            return result % range + min;
         }
 
         private static object TryClone(object src, Type type)
