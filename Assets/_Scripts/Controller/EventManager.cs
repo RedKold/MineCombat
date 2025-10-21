@@ -1273,6 +1273,8 @@ namespace MineCombat
             // empty events.
             Events.Add("CombatantDied", new PriorityEvent<Combatant>());
             Events.Add("HealthChanged", new PriorityEvent<Combatant>());
+
+            // Build constant events.
         }
     }
 }
