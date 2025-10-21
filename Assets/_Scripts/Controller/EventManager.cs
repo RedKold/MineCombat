@@ -1071,7 +1071,7 @@ namespace MineCombat
         {
             if (_items.ContainsKey(id))
                 throw new ArgumentException($"事件分支{id}被重复创建");
-            _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight)); throw new ArgumentException("需要无参数的无返回值函数");
+            _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight)); 
         }
 
         public void CreateItem<T1, T2, T3, T4, T5, T6, T7, T8>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7, T8> prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
