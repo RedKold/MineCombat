@@ -14,8 +14,22 @@ public class CombatantView : MonoBehaviour
     [SerializeField] private SpriteRenderer healthBar;
     [SerializeField] private SpriteRenderer avatar;
 
-    // a static list to keep track of all CombatantView instances
     public static List<CombatantView> AllViews = new List<CombatantView>();
+
+
+    // Maintain the List
+     private void Awake()
+    {
+        // 添加到全局列表
+        if (!AllViews.Contains(this))
+            AllViews.Add(this);
+    }
+
+    private void OnDestroy()
+    {
+        // 移除（防止引用已销毁对象）
+        AllViews.Remove(this);
+    }
     public Combatant _combatant{ get; private set; }
     private float _displayedHealthRatio = 1f;  // 当前显示的血量比例（用于平滑动画）
 

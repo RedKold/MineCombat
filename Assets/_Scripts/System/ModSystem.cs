@@ -4,6 +4,7 @@ using UnityEngine;
 using MineCombat;
 using System;
 using static MineCombat.EventManager;
+using UnityEngine.Assertions;
 
 public class ModSystem : MonoBehaviour
 {
@@ -51,12 +52,14 @@ public static class ModLoder
         Events["CombatantDied"].Bind(new Action<Combatant>(c =>
         {
             var view = CombatantView.AllViews.Find(v => v._combatant == c);
+            Debug.Log("Finding view for " + c.Name);
             if (view != null)
             {
                 view.SetSelected(false);
                 view.ShowWrapper(false);
                 Debug.Log($"{c.Name} has died.");
             }
+            Assert.IsNotNull(view, "CombatantView should not be null on CombatantDied event");
         }));
 
         Events["HealthChanged"].Bind(new Action<Combatant>(c =>
@@ -66,6 +69,7 @@ public static class ModLoder
             {
                 view.UpdateHealthDisplay();
             }
+            Assert.IsNotNull(view, "CombatantView should not be null on CombatantDied event");
         }));
 
     
