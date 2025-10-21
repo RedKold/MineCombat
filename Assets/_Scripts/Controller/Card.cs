@@ -20,6 +20,8 @@ namespace MineCombat
     {
 #nullable enable
         public readonly byte cost;
+
+        // X费牌
         public readonly bool Xcost;
         public readonly Rarity rarity;
         public readonly ITags tags;

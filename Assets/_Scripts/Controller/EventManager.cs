@@ -33,6 +33,7 @@ namespace MineCombat
                 throw new ArgumentException("需要无参数的无返回值函数");
         }
 
+        // 触发器
         internal void Trigger()
         {
             _actions();
