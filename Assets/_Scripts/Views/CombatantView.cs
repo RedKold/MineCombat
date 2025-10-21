@@ -3,6 +3,8 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 using MineCombat;
+using static MineCombat.EventManager;
+
 
 public class CombatantView : MonoBehaviour
 {
@@ -22,7 +24,7 @@ public class CombatantView : MonoBehaviour
         SetCombatant(combatant.Name, combatant.CurHP, combatant.MaxHP, avatar != null ? avatar.sprite : null);
 
         // 订阅死亡事件
-        EventManager.Bind("CombatantDied", new Action<Combatant>(c =>
+        Events["CombatantDied"].Bind(new Action<Combatant>(c =>
         {
             if (c == _combatant)
             {
@@ -33,7 +35,7 @@ public class CombatantView : MonoBehaviour
         }));
 
         // 订阅血量变化事件
-        EventManager.Bind("HealthChanged", new Action<Combatant>(c =>
+        Events["HealthChanged"].Bind(new Action<Combatant>(c =>
         {
             if (c == _combatant)
             {

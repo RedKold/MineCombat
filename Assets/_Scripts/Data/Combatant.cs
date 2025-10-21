@@ -1,4 +1,5 @@
 using System;
+using static MineCombat.EventManager;
 
 namespace MineCombat
 {
@@ -37,11 +38,11 @@ namespace MineCombat
             if (CurHP <= 0) // 或 if (!IsAlive())
             {
                 // 假设 EventManager 可用
-                EventManager.Trigger("CombatantDied", this);
+                Events.Trigger("CombatantDied",this);
             }
 
             // Trigger Health Changed Event
-            EventManager.Trigger("HealthChanged", this);
+            Events.Trigger("HealthChanged", this);
         } 
 
         // 6. isDead 属性现在可以基于基类的生命值状态来定义

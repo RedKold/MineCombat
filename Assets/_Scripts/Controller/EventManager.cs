@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine.UIElements;
 
 namespace MineCombat
 {
@@ -1268,6 +1269,10 @@ namespace MineCombat
             Events.Add("TestEvent3", new PriorityEvent<(int, int)>(item => { var(i1, i2) = item; Console.WriteLine($"i1 = {i1}, i2 = {i2}"); }, item => { var (i1, i2) = item; Console.WriteLine($"i1 = {i1}, i2 = {i2}"); }));
             SlicedEvents.Add("TestSlicedEvent1", new SlicedEvent());
             RandomEvents.Add("TestRandomEvent1", new RandomEvent());
+
+            // empty events.
+            Events.Add("CombatantDied", new PriorityEvent<Combatant>());
+            Events.Add("HealthChanged", new PriorityEvent<Combatant>());
         }
     }
 }
