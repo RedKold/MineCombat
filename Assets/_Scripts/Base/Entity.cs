@@ -26,8 +26,8 @@ namespace MineCombat
             _health = Math.Min(_maxHealth, Math.Max(1, health));
             this.tags = tags;
         }
-        internal Entity(double maxHealth) : this(maxHealth, StaticTags.Empty) { }
-        internal Entity(double maxHealth, double health) : this(maxHealth, health, StaticTags.Empty) { }
+        internal Entity(double maxHealth) : this(maxHealth, ConstTags.Empty) { }
+        internal Entity(double maxHealth, double health) : this(maxHealth, health, ConstTags.Empty) { }
 
         public double GetMaxHealth()
         {
@@ -118,5 +118,27 @@ namespace MineCombat
 
         public virtual void Die() { }
         public virtual void Revive() { }
+    }
+
+    public class Player : Entity
+    {
+#nullable enable
+        public Slots<Card> Inventory { get; private set; }
+        public Slots<Card> Situation { get; private set; }
+        public Card? ArmorSlot;
+        private Dictionary<Material, uint> _material_bag = new(23);
+
+        internal Player(double maxHealth, ITags tags, uint ivt = 36, uint sta = 3) : base(maxHealth, tags)
+        {
+            Inventory = new(ivt);
+            Situation = new(sta);
+        }
+
+        internal Player(double maxHealth, uint ivt = 36, uint sta = 3) : base(maxHealth)
+        {
+            Inventory = new(ivt);
+            Situation = new(sta);
+        }
+#nullable disable
     }
 }

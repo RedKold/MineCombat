@@ -7,20 +7,17 @@ using System.Threading;
 namespace MineCombat
 {
     //通用数据存储格式，仅支持int，double，bool三种基础值类型，对string类型有优化，也能存储引用对象
-    public class Properties
+    public class Properties : ICloneable<Properties>
     {
-#nullable enable
         internal readonly static Properties Default = new();
 
-        private readonly static Dictionary<string, uint> _keys = new();
-        private static uint next = 1;
-        private static object _keyLock = new();
-
-        private readonly Lazy<Dictionary<uint, int>> _ints = new(() => new Dictionary<uint, int>(), LazyThreadSafetyMode.ExecutionAndPublication);
-        private readonly Lazy<Dictionary<uint, double>> _doubles = new(() => new Dictionary<uint, double>(), LazyThreadSafetyMode.ExecutionAndPublication);
-        private readonly Lazy<Dictionary<uint, bool>> _bools = new(() => new Dictionary<uint, bool>(), LazyThreadSafetyMode.ExecutionAndPublication);
-        private readonly Lazy<Dictionary<uint, string>> _strings = new(() => new Dictionary<uint, string>(), LazyThreadSafetyMode.ExecutionAndPublication);
-        private readonly Lazy<Dictionary<uint, object>> _objects = new(() => new Dictionary<uint, object>(), LazyThreadSafetyMode.ExecutionAndPublication);
+        private static KeyTranslator<string> _translator = new(97);
+#nullable enable
+        private readonly Lazy<Dictionary<uint, int>> _ints;
+        private readonly Lazy<Dictionary<uint, double>> _doubles;
+        private readonly Lazy<Dictionary<uint, bool>> _bools;
+        private readonly Lazy<Dictionary<uint, string>> _strings;
+        private readonly Lazy<Dictionary<uint, object>> _objects;
 
         private object? _intLock;
         private object? _doubleLock;
@@ -39,20 +36,41 @@ namespace MineCombat
         private object StringLock => _stringLock ??= new object();
         private object ObjectLock => _objectLock ??= new object();
 
-        internal Properties() { }
-
-        private static uint Translate(string name, bool add = false)
+        internal Properties() 
         {
-            lock (_keyLock)
-            {
-                uint result = _keys.TryGetValue(name, out var key) ? key : 0;
-                if (add && result == 0)
-                {
-                    _keys.Add(name, next);
-                    result = next++;
-                }
-                return result;
-            }
+            _ints = new(() => new Dictionary<uint, int>(), LazyThreadSafetyMode.ExecutionAndPublication);
+            _doubles = new(() => new Dictionary<uint, double>(), LazyThreadSafetyMode.ExecutionAndPublication);
+            _bools = new(() => new Dictionary<uint, bool>(), LazyThreadSafetyMode.ExecutionAndPublication);
+            _strings = new(() => new Dictionary<uint, string>(), LazyThreadSafetyMode.ExecutionAndPublication);
+            _objects = new(() => new Dictionary<uint, object>(), LazyThreadSafetyMode.ExecutionAndPublication);
+        }
+
+        protected Properties(Properties src)
+        {
+            if (src._ints.IsValueCreated)
+                _ints = new Lazy<Dictionary<uint, int>>(() => src._ints.Value?.ToDictionary(pair => pair.Key, pair => pair.Value) ?? new());
+            else
+                _ints = new(() => new Dictionary<uint, int>(), LazyThreadSafetyMode.ExecutionAndPublication);
+
+            if (src._doubles.IsValueCreated)
+                _doubles = new Lazy<Dictionary<uint, double>>(() => src._doubles.Value?.ToDictionary(pair => pair.Key, pair => pair.Value) ?? new());
+            else
+                _doubles = new(() => new Dictionary<uint, double>(), LazyThreadSafetyMode.ExecutionAndPublication);
+
+            if (src._bools.IsValueCreated)
+                _bools = new Lazy<Dictionary<uint, bool>>(() => src._bools.Value?.ToDictionary(pair => pair.Key, pair => pair.Value) ?? new());
+            else
+                _bools = new(() => new Dictionary<uint, bool>(), LazyThreadSafetyMode.ExecutionAndPublication);
+
+            if (src._strings.IsValueCreated)
+                _strings = new Lazy<Dictionary<uint, string>>(() => src._strings.Value?.ToDictionary(pair => pair.Key, pair => pair.Value) ?? new());
+            else
+                _strings = new(() => new Dictionary<uint, string>(), LazyThreadSafetyMode.ExecutionAndPublication);
+
+            if (src._objects.IsValueCreated)
+                _objects = new Lazy<Dictionary<uint, object>>(() => src._objects.Value?.ToDictionary(pair => pair.Key, pair => pair.Value.TryClone()) ?? new());
+            else
+                _objects = new(() => new Dictionary<uint, object>(), LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         //若属性名已存在，返回假，不可用于更新属性的值
@@ -60,7 +78,7 @@ namespace MineCombat
         {
             lock (IntLock)
             {
-                uint id = Translate(name, true);
+                uint id = _translator.Translate(name, true);
                 if (Ints.ContainsKey(id))
                     return false;
                 Ints[id] = i;
@@ -71,7 +89,7 @@ namespace MineCombat
         {
             lock (DoubleLock)
             {
-                uint id = Translate(name, true);
+                uint id = _translator.Translate(name, true);
                 if (Doubles.ContainsKey(id))
                     return false;
                 Doubles[id] = d;
@@ -82,7 +100,7 @@ namespace MineCombat
         {
             lock (BoolLock)
             {
-                uint id = Translate(name, true);
+                uint id = _translator.Translate(name, true);
                 if (Bools.ContainsKey(id))
                     return false;
                 Bools[id] = b;
@@ -93,7 +111,7 @@ namespace MineCombat
         {
             lock (StringLock)
             {
-                uint id = Translate(name, true);
+                uint id = _translator.Translate(name, true);
                 if (Strings.ContainsKey(id))
                     return false;
                 Strings[id] = s;
@@ -104,7 +122,7 @@ namespace MineCombat
         {
             lock (ObjectLock)
             {
-                uint id = Translate(name, true);
+                uint id = _translator.Translate(name, true);
                 if (Objects.ContainsKey(id))
                     return false;
                 Objects[id] = t;
@@ -117,7 +135,7 @@ namespace MineCombat
         {
             lock (IntLock)
             {
-                uint id = Translate(name, true);
+                uint id = _translator.Translate(name, true);
                 bool result = Ints.ContainsKey(id);
                 Ints[id] = i;
                 return result;
@@ -127,7 +145,7 @@ namespace MineCombat
         {
             lock (DoubleLock)
             {
-                uint id = Translate(name, true);
+                uint id = _translator.Translate(name, true);
                 bool result = Doubles.ContainsKey(id);
                 Doubles[id] = d;
                 return result;
@@ -137,7 +155,7 @@ namespace MineCombat
         {
             lock (BoolLock)
             {
-                uint id = Translate(name, true);
+                uint id = _translator.Translate(name, true);
                 bool result = Bools.ContainsKey(id);
                 Bools[id] = b;
                 return result;
@@ -147,7 +165,7 @@ namespace MineCombat
         {
             lock (StringLock)
             {
-                uint id = Translate(name, true);
+                uint id = _translator.Translate(name, true);
                 bool result = Strings.ContainsKey(id);
                 Strings[id] = s;
                 return result;
@@ -157,7 +175,7 @@ namespace MineCombat
         {
             lock (ObjectLock)
             {
-                uint id = Translate(name, true);
+                uint id = _translator.Translate(name, true);
                 bool result = Strings.ContainsKey(id);
                 Objects[id] = t;
                 return result;
@@ -183,7 +201,7 @@ namespace MineCombat
         }
         public int? GetInt(string name, bool checkDefault = true)
         {
-            uint id = Translate(name);
+            uint id = _translator.Translate(name);
             return id == 0 ? null : GetInt(id, checkDefault);
         }
         private double? GetDouble(uint id, bool checkDefault = true)
@@ -204,7 +222,7 @@ namespace MineCombat
         }
         public double? GetDouble(string name, bool checkDefault = true)
         {
-            uint id = Translate(name);
+            uint id = _translator.Translate(name);
             return id == 0 ? null : GetDouble(id, checkDefault);
         }
         private bool? GetBool(uint id, bool checkDefault = true)
@@ -225,7 +243,7 @@ namespace MineCombat
         }
         public bool? GetBool(string name, bool checkDefault = true)
         {
-            uint id = Translate(name);
+            uint id = _translator.Translate(name);
             return id == 0 ? null : GetBool(id, checkDefault);
         }
         private string? GetString(uint id, bool checkDefault = true)
@@ -246,7 +264,7 @@ namespace MineCombat
         }
         public string? GetString(string name, bool checkDefault = true)
         {
-            uint id = Translate(name);
+            uint id = _translator.Translate(name);
             return id == 0 ? null : GetString(id, checkDefault);
         }
         /* 只能用于获取引用类型的值
@@ -269,7 +287,7 @@ namespace MineCombat
         }
         public T? Get<T>(string name, bool checkDefault = true) where T : notnull
         {
-            uint id = Translate(name);
+            uint id = _translator.Translate(name);
             return id == 0 ? default : Get<T>(id, checkDefault);
         }
 
@@ -278,7 +296,7 @@ namespace MineCombat
         {
             lock (IntLock)
             {
-                uint id = Translate(name);
+                uint id = _translator.Translate(name);
                 if (id == 0 || !Ints.ContainsKey(id))
                     return false;
                 int i = Ints[id];
@@ -291,7 +309,7 @@ namespace MineCombat
         {
             lock (DoubleLock)
             {
-                uint id = Translate(name);
+                uint id = _translator.Translate(name);
                 if (id == 0 || !Doubles.ContainsKey(id))
                     return false;
                 double d = Doubles[id];
@@ -304,7 +322,7 @@ namespace MineCombat
         {
             lock (BoolLock)
             {
-                uint id = Translate(name);
+                uint id = _translator.Translate(name);
                 if (id == 0 || !Bools.ContainsKey(id))
                     return false;
                 bool b = Bools[id];
@@ -317,7 +335,7 @@ namespace MineCombat
         {
             lock (StringLock)
             {
-                uint id = Translate(name);
+                uint id = _translator.Translate(name);
                 if (id == 0 || !Strings.ContainsKey(id))
                     return false;
                 string s = Strings[id];
@@ -332,7 +350,7 @@ namespace MineCombat
         {
             lock (ObjectLock)
             {
-                uint id = Translate(name);
+                uint id = _translator.Translate(name);
                 if (id != 0 && Objects.TryGetValue(id, out object? obj) && obj is T t)
                 {
                     processer(ref t);
@@ -341,6 +359,11 @@ namespace MineCombat
                 }
                 return false;
             }
+        }
+
+        public virtual Properties Clone()
+        {
+            return new Properties(this);
         }
 
         static Properties()
