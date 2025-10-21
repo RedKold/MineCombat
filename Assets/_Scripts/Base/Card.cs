@@ -23,6 +23,7 @@ namespace MineCombat
 
     abstract public class ACard : Properties, IEquatable<ACard>
     {
+#nullable enable
         protected static KeyValueTranslator<string> _translator = new(97, true);
 
         public readonly uint id;
@@ -64,6 +65,7 @@ namespace MineCombat
         {
             return (int)id;
         }
+#nullable disable
     }
 
     public sealed class Card : ACard, ICloneable<Card>
