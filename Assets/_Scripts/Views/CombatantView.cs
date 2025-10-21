@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using MineCombat;
 using static MineCombat.EventManager;
+using System.Collections.Generic;
 
 
 public class CombatantView : MonoBehaviour
@@ -13,7 +14,9 @@ public class CombatantView : MonoBehaviour
     [SerializeField] private SpriteRenderer healthBar;
     [SerializeField] private SpriteRenderer avatar;
 
-    private Combatant _combatant;
+    // a static list to keep track of all CombatantView instances
+    public static List<CombatantView> AllViews = new List<CombatantView>();
+    public Combatant _combatant{ get; private set; }
     private float _displayedHealthRatio = 1f;  // 当前显示的血量比例（用于平滑动画）
 
     public void BindCombatant(Combatant combatant)
@@ -23,33 +26,30 @@ public class CombatantView : MonoBehaviour
         // 初始显示
         SetCombatant(combatant.Name, combatant.CurHP, combatant.MaxHP, avatar != null ? avatar.sprite : null);
 
-        // 订阅死亡事件
-        Events["CombatantDied"].Bind(new Action<Combatant>(c =>
-        {
-            if (c == _combatant)
-            {
-                SetSelected(false);
-                ShowWrapper(false);
-                Debug.Log($"{c.Name} has died.");
-            }
-        }));
-
-        // 订阅血量变化事件
-        Events["HealthChanged"].Bind(new Action<Combatant>(c =>
-        {
-            if (c == _combatant)
-            {
-                UpdateHealthDisplay(); // 更新血条和文字
-            }
-        }));
-
+        
         // Update initial health display
         Debug.Log("Binding combatant view for " + combatant.Name);
         UpdateHealthDisplay(); // 更新血条和文字
     }
 
+    private void OnHealthChanged(Combatant c)
+    {
+        if (c == _combatant)
+        {
+            UpdateHealthDisplay(); // 刷新血条
+        }
+    }
+
+    private void OnCombatantDied(Combatant c)
+    {
+        if (c == _combatant)
+        {
+            SetSelected(false);
+            ShowWrapper(false);
+        }
+    }
     // 更新血条与血量文字
-    private void UpdateHealthDisplay()
+    public void UpdateHealthDisplay()
     {
         if (_combatant == null) return;
 
@@ -118,6 +118,8 @@ public class CombatantView : MonoBehaviour
         transform.localPosition = pos;
     }
 
+
+    
     public void ShowWrapper(bool show)
     {
         gameObject.SetActive(show);
