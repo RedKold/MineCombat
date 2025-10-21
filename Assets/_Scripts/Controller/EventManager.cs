@@ -471,7 +471,12 @@ namespace MineCombat
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        internal void Trigger()
+        public void Bind<T1, T2, T3, T4, T5, T6, T7, T8>(Action<T1, T2, T3, T4, T5, T6, T7, T8> action, int priority = 0)
+        {
+            throw new ArgumentException("需要无参数的无返回值函数");
+        }
+
+        public AConstPriorityEvent ConstCast()
         {
             Action? action = _prepare;
             action += Get();
