@@ -93,7 +93,7 @@ namespace MineCombat
             return new Card(id, cost, Xcost, rarity, tags, action);
         }
 
-        public override Card Clone()
+        public new Card Clone()
         {
             return new Card(this);
         }
@@ -106,7 +106,7 @@ namespace MineCombat
 
         private Material(Material src) : base(src) { }
 
-        public override Material Clone()
+        public new Material Clone()
         {
             return new Material(this);
         }
