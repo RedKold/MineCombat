@@ -5,6 +5,7 @@ using MineCombat;
 using UnityEngine;
 using UnityEngine.Splines;
 
+// this scripts is dealing with the hand view and some animations
 public class HandView : MonoBehaviour
 {
     [SerializeField] private SplineContainer splineContainer;
@@ -25,8 +26,8 @@ public class HandView : MonoBehaviour
         float firstCardPosition = 0.5f - (cards.Count - 1) * cardSpacing / 2f;
 
         Spline spline = splineContainer.Spline;
-        
-        for(int i = 0;i < cards.Count;i++)
+
+        for (int i = 0; i < cards.Count; i++)
         {
             float p = firstCardPosition + i * cardSpacing;
             Vector3 targetPosition = spline.EvaluatePosition(p);

@@ -6,6 +6,8 @@ using System.Text;
 
 namespace MineCombat
 {
+
+   
     public interface ICloneable<T>
     {
         public T Clone();
@@ -30,6 +32,18 @@ namespace MineCombat
         public readonly Rarity rarity;
         public readonly ITags tags;
         public string Name => _translator.Translate(id);
+
+        // add static method to access translator, for convenience. You can make it more grateful
+        public static void RegisterTranslator(uint id, string name)
+        {
+            _translator.Translate(name, true); // 或 _translator.Register(id, name) 如果你有 Register 方法
+        }
+
+        public static bool HasTranslatorValue(uint id)
+        {
+            return _translator.IsValid(id);
+        }
+
 
         protected ACard(uint id, Rarity rarity, ITags tags)
         {
@@ -75,6 +89,13 @@ namespace MineCombat
         public readonly bool Xcost;
         public readonly Action<Entity, Card, Box<Entity>, Box<string>>? action;
 
+        // 卡牌的描述信息
+        public string Description => data != null ? data.Description : string.Empty;
+
+        // Judge data is null or not;
+        private readonly CardData? data;
+    
+
         private Card(uint id, byte cost, bool Xcost, Rarity rarity, ITags tags, Action<Entity, Card, Box<Entity>, Box<string>>? action) : base(id, rarity, tags)
         {
             this.cost = cost;
@@ -87,6 +108,20 @@ namespace MineCombat
             cost = src.cost;
             Xcost = src.Xcost;
             action = src.action;
+        }
+
+         // 内部构造函数，只能在同程序集或类内部使用
+        internal Card(CardData data)
+            : base(
+                data.id,
+                Enum.TryParse<Rarity>(data.rarity, out var r) ? r : Rarity.Common,
+                new Tags() // 如果 CardData 有 tags，可以用 data.tags
+            )
+        {
+            this.data = data;
+            this.cost = (byte)data.cost;
+            this.Xcost = data.Xcost;
+            this.action = null; // 根据需要可以修改
         }
 
         internal static Card Create(string name, byte cost, bool Xcost, Rarity rarity, ITags tags, Action<Entity, Card, Box<Entity>, Box<string>>? action = null)

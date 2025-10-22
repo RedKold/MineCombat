@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
-
+using MineCombat;
+using UnityEngine.Assertions;
 namespace MineCombat
 {
     public class CardView : MonoBehaviour
@@ -10,6 +11,10 @@ namespace MineCombat
         [SerializeField] private SpriteRenderer cost;
         [SerializeField] private SpriteRenderer image;
 
+        [SerializeField] private GameObject wrapper;
+
+        public Card Card { get; private set; }
+
         // 设置卡牌信息
         public void SetCard(string name, string desc, Sprite imageSprite, Sprite costSprite)
         {
@@ -17,6 +22,17 @@ namespace MineCombat
             if (description != null) description.text = desc;
             if (image != null) image.sprite = imageSprite;
             if (cost != null) cost.sprite = costSprite;
+        }
+
+        public void SetCard(Card card)
+        {
+            
+            Card = card;
+            title.text = card.Name;
+            // description.text = CardDatabaseSystem.Instance.GetCardDescription(card); 
+            description.text = card.Description;
+            image.sprite = CardDatabaseSystem.Instance.GetCardImage(card.id);
+            cost.sprite = CardDatabaseSystem.Instance.GetCostImage(card.cost, card.Xcost);
         }
 
         // 高亮显示
@@ -40,7 +56,23 @@ namespace MineCombat
         // 显示 wrapper（保持默认显示）
         public void ShowWrapper(bool show)
         {
-            gameObject.SetActive(show);
+            wrapper.SetActive(show);
+        }
+
+        
+        // 处理悬停
+        void OnMouseEnter()
+        {
+            wrapper.SetActive(false);
+            Vector3 pos = new(transform.position.x, -2, 0);
+            CardViewHoverSystem.Instance.Show(Card, pos);
+        }
+        
+
+        void OnMouseExit()
+        {
+            CardViewHoverSystem.Instance.Hide();
+            wrapper.SetActive(true);
         }
     }
 }
