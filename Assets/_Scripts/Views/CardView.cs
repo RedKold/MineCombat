@@ -60,11 +60,11 @@ namespace MineCombat
         }
 
         
-        // 处理悬停
+        // 处理悬停鼠标方法
         void OnMouseEnter()
         {
             wrapper.SetActive(false);
-            Vector3 pos = new(transform.position.x, -2, 0);
+            Vector3 pos = new(transform.position.x, -2 , 0);
             CardViewHoverSystem.Instance.Show(Card, pos);
         }
         
