@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine.UIElements;
 
 namespace MineCombat
 {
@@ -1068,7 +1069,7 @@ namespace MineCombat
         {
             if (_items.ContainsKey(id))
                 throw new ArgumentException($"事件分支{id}被重复创建");
-            _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight)); throw new ArgumentException("需要无参数的无返回值函数");
+            _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight)); 
         }
 
         public void CreateItem<T1, T2, T3, T4, T5, T6, T7, T8>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7, T8>? prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
@@ -1266,6 +1267,10 @@ namespace MineCombat
             SlicedEvents.Add("TestSlicedEvent1", new SlicedEvent());
             RandomEvents.Add("TestRandomEvent1", new RandomEvent());
 
+            // empty events.
+            Events.Add("CombatantDied", new PriorityEvent<Combatant>());
+            Events.Add("HealthChanged", new PriorityEvent<Combatant>());
+
             //打出一张牌
             Events.Add("CardDurabilityDamaged", new PriorityEvent<(Card, uint)>(null, (Card card, uint damage) =>{
                 var max = card.GetInt("mc_card_durability_max");
@@ -1288,6 +1293,7 @@ namespace MineCombat
                 });
             }));
             SlicedEvents.Add("CardPlayed", new SlicedEvent<(Entity, Card, Box<Entity>, Context)>());
+            // Build constant events.
         }
     }
 }

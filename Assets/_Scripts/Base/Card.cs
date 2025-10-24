@@ -28,12 +28,25 @@ namespace MineCombat
 
     abstract public class ACard : Properties, IEquatable<ACard>
     {
+#nullable enable
         protected static KeyValueTranslator<string> _translator = new(97, true);
 
         public readonly uint id;
         public readonly Rarity rarity;
         public readonly ITags tags;
         public string Name => _translator.Translate(id);
+
+        // add static method to access translator, for convenience. You can make it more grateful
+        public static void RegisterTranslator(uint id, string name)
+        {
+            _translator.Translate(name, true); // 或 _translator.Register(id, name) 如果你有 Register 方法
+        }
+
+        public static bool HasTranslatorValue(uint id)
+        {
+            return _translator.IsValid(id);
+        }
+
 
         protected ACard(uint id, Rarity rarity, ITags tags)
         {
@@ -69,6 +82,7 @@ namespace MineCombat
         {
             return (int)id;
         }
+#nullable disable
     }
 
     public sealed class Card : ACard, ICloneable<Card>
@@ -81,7 +95,14 @@ namespace MineCombat
 
         internal IReadOnlyList<Box<string>?> Commands => _commands.AsReadOnly();
 
-        private Card(uint id, byte cost, bool Xcost, Rarity rarity, ITags tags, Target target, Box<string>?[] commands) : base(id, rarity, tags)
+        // 卡牌的描述信息
+        public string Description => data != null ? data.Description : string.Empty;
+
+        // Judge data is null or not;
+        private readonly CardData? data;
+    
+
+        private Card(uint id, byte cost, bool Xcost, Rarity rarity, ITags tags, Action<Entity, Card, Box<Entity>, Box<string>>? action) : base(id, rarity, tags)
         {
             this.cost = cost;
             this.Xcost = Xcost;
@@ -97,12 +118,26 @@ namespace MineCombat
             _commands = src._commands;
         }
 
-        internal static Card Create(string name, byte cost, bool Xcost, Rarity rarity, ITags tags, Target target = Target.Selected, string commands = "")
+         // 内部构造函数，只能在同程序集或类内部使用
+        internal Card(CardData data)
+            : base(
+                data.id,
+                Enum.TryParse<Rarity>(data.rarity, out var r) ? r : Rarity.Common,
+                new Tags() // 如果 CardData 有 tags，可以用 data.tags
+            )
+        {
+            this.data = data;
+            this.cost = (byte)data.cost;
+            this.Xcost = data.Xcost;
+            this.action = null; // 根据需要可以修改
+        }
+
+        internal static Card Create(string name, byte cost, bool Xcost, Rarity rarity, ITags tags, Action<Entity, Card, Box<Entity>, Box<string>>? action = null)
         {
             return new Card(_translator.Translate(name), cost, Xcost, rarity, tags, target, Parser.ToBoxArray(commands) ?? new Box<string>?[3]);
         }
 
-        public override Card Clone()
+        public new Card Clone()
         {
             return new Card(this);
         }
@@ -115,7 +150,7 @@ namespace MineCombat
 
         private Material(Material src) : base(src) { }
 
-        public override Material Clone()
+        public new Material Clone()
         {
             return new Material(this);
         }

@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics;
+using static MineCombat.EventManager;
+using UnityEngine;
 
 namespace MineCombat
 {
@@ -34,14 +37,15 @@ namespace MineCombat
 
             // Trigger Death Event
             // 5. 使用基类 Entity 提供的 IsAlive() 或 CurHP 属性来判断
-            if (CurHP <= 0) // 或 if (!IsAlive())
+            if (CurHP <=1e-9 || !IsAlive()) // 或 if (!IsAlive())
             {
                 // 假设 EventManager 可用
-                EventManager.Trigger("CombatantDied", this);
+                UnityEngine.Debug.Log("Combatant " + Name + " has died.");
+                Events.Trigger("CombatantDied",this);
             }
 
             // Trigger Health Changed Event
-            EventManager.Trigger("HealthChanged", this);
+            Events.Trigger("HealthChanged", this);
         } 
 
         // 6. isDead 属性现在可以基于基类的生命值状态来定义
