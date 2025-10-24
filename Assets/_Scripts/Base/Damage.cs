@@ -54,17 +54,14 @@ namespace MineCombat
 
     public class Damage
     {
-        internal readonly Entity target;
-
 #nullable enable
         internal readonly string type;
         internal double value;
         private Dictionary<string, IModifier<Damage>> _modifiers;
         protected object _lock = new();
 
-        internal Damage(Entity target, string type, double value, Dictionary<string, IModifier<Damage>>? modifiers = null)
+        internal Damage(string type, double value, Dictionary<string, IModifier<Damage>>? modifiers = null)
         {
-            this.target = target;
             this.type = type;
             this.value = value;
             _modifiers = modifiers?.Any() == true ? modifiers : new();
@@ -120,7 +117,6 @@ namespace MineCombat
                     mdf.Process(this);
                 }
                 result = this.value;
-                target.ApplyDamage(result);
                 this.value = value;
             }
             return result;
@@ -142,7 +138,6 @@ namespace MineCombat
             return types_tags_table.Match(type, tag);
         }
 
-        //预定义类型和标签 
         static DamageTags()
         {
             types_tags_table.AddorMerge("mc_magic", (ConstTags)"{mc_bypass_armor, mc_bypass_test}");

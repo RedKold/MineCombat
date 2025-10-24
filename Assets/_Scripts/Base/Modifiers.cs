@@ -5,8 +5,6 @@ using System.Text;
 
 namespace MineCombat
 {
-    public delegate void Process<T>(ref T t);
-
     public interface IModifier<T> : IComparable<IModifier<T>>
     {
         int Class();

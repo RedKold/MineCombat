@@ -24,7 +24,7 @@ namespace MineCombat
             _values = null;
         }
 
-        public Box(T[] values)
+        public Box(params T[] values)
         {
             if (values.Length == 0)
             {
@@ -55,7 +55,7 @@ namespace MineCombat
             _values = null;
         }
 
-        public void UpdateContent(T[] values)
+        public void UpdateContent(params T[] values)
         {
             _value = default;
             _values = values;
@@ -78,6 +78,8 @@ namespace MineCombat
             values = _values;
         }
 #nullable disable
+        public static implicit operator Box<T>(T value) => new Box<T>(value);
+        public static implicit operator Box<T>(T[] values) => new Box<T>(values);
     }
 
     public class Slots<T> where T : class
@@ -156,12 +158,12 @@ namespace MineCombat
             return true;
         }
 
-        public void ForEach(Action<T, int> action)
+        public void ForEach(Action<T, uint> action)
         {
             for (int i = 0; i < _count; i++)
             {
                 if (_slots[i] is not null)
-                    action(_slots[i], i);
+                    action(_slots[i], (uint)i);
             }
         }
 

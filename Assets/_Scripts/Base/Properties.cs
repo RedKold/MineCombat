@@ -368,7 +368,7 @@ namespace MineCombat
 
         static Properties()
         {
-            //读文件初始化Default
+            //在这里添加属性的默认值
         }
 #nullable disable
     }
