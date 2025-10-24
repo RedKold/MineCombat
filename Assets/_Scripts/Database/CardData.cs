@@ -4,9 +4,10 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Database/Card")]
 public class CardData : ScriptableObject
 {
-    public uint id;
     public string Name;
     public string rarity;
+    public string target;
+    public string commands;
     public int cost;
     public bool Xcost;
 

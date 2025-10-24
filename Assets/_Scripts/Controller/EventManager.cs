@@ -1272,7 +1272,8 @@ namespace MineCombat
             Events.Add("HealthChanged", new PriorityEvent<Combatant>());
 
             //打出一张牌
-            Events.Add("CardDurabilityDamaged", new PriorityEvent<(Card, uint)>(null, (Card card, uint damage) =>{
+            Events.Add("CardDurabilityDamaged", new PriorityEvent<(Card, uint)>(null, ((Card, uint) tuple) => {
+                var (card, damage) = tuple;
                 var max = card.GetInt("mc_card_durability_max");
                 if (max is null)
                     return;
@@ -1293,6 +1294,7 @@ namespace MineCombat
                 });
             }));
             SlicedEvents.Add("CardPlayed", new SlicedEvent<(Entity, Card, Box<Entity>, Context)>());
+            
             // Build constant events.
         }
     }

@@ -61,6 +61,20 @@ namespace MineCombat
         }
     }
 
+    //待完成
+    public class Translator<K, V> : ITranslator<K, V>
+    {
+        public bool IsValid(V value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public V Translate(K key)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class KeyValueTranslator<T> : IReversableTranslator<T, uint> where T : notnull
     {
         private Dictionary<T, uint> _keys;

@@ -60,7 +60,7 @@ public class CombatManager : MonoBehaviour
     {
         if (combatants.Length > 0)
         {
-            Damage fireDamage = new Damage(new Entity(30),"mc_fire", 120.0f);
+            Damage fireDamage = new Damage("mc_fire", 120.0);
             combatants[0].TakeDamage(fireDamage);
             Debug.Log($"🔥 {combatants[0].Name} 受到火焰伤害，当前 HP: {combatants[0].CurHP}/{combatants[0].MaxHP}");
         }
