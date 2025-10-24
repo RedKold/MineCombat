@@ -1,0 +1,200 @@
+using UnityEngine;
+using MineCombat;
+using System.Collections.Generic;
+
+namespace MineCombat
+{
+    /// <summary>
+    /// 卡牌拖拽系统，管理卡牌的拖拽和出牌逻辑
+    /// </summary>
+    public class CardDragSystem : Singleton<CardDragSystem>
+    {
+        [Header("拖拽设置")]
+        [SerializeField] private float dragThreshold = 0.1f; // 拖拽阈值
+        [SerializeField] private float dragScale = 1.2f; // 拖拽时的缩放
+        [SerializeField] private LayerMask playAreaLayer = 1; // 出牌区域层级
+        
+        [Header("拖拽状态")]
+        [SerializeField] private bool isDragging = false;
+        [SerializeField] private CardView draggedCard = null;
+        [SerializeField] private Vector3 originalPosition;
+        [SerializeField] private Vector3 originalScale;
+        [SerializeField] private int originalSortingOrder;
+        
+        private Camera mainCamera;
+        private List<IPlayArea> playAreas = new List<IPlayArea>();
+        
+        public bool IsDragging => isDragging;
+        public CardView DraggedCard => draggedCard;
+        
+        protected override void Awake()
+        {
+            base.Awake();
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+                mainCamera = FindObjectOfType<Camera>();
+        }
+        
+        private void Update()
+        {
+            if (isDragging && draggedCard != null)
+            {
+                UpdateDragPosition();
+                CheckPlayArea();
+            }
+        }
+        
+        /// <summary>
+        /// 开始拖拽卡牌
+        /// </summary>
+        public void StartDrag(CardView cardView)
+        {
+            if (isDragging) return;
+            
+            draggedCard = cardView;
+            isDragging = true;
+            
+            // 保存原始状态
+            originalPosition = cardView.transform.position;
+            originalScale = cardView.transform.localScale;
+            
+            // 设置拖拽状态
+            cardView.transform.localScale = originalScale * dragScale;
+            cardView.SetSelected(true);
+            
+            // 提高渲染层级
+            var spriteRenderer = cardView.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                originalSortingOrder = spriteRenderer.sortingOrder;
+                spriteRenderer.sortingOrder = 1000; // 确保在最上层
+            }
+            
+            Debug.Log($"开始拖拽卡牌: {cardView.Card?.Name}");
+        }
+        
+        /// <summary>
+        /// 结束拖拽
+        /// </summary>
+        public void EndDrag()
+        {
+            if (!isDragging || draggedCard == null) return;
+            
+            bool played = false;
+            
+            // 检查是否在出牌区域内
+            foreach (var playArea in playAreas)
+            {
+                if (playArea.CanPlayCard(draggedCard))
+                {
+                    if (playArea.TryPlayCard(draggedCard))
+                    {
+                        played = true;
+                        Debug.Log($"成功出牌: {draggedCard.Card?.Name}");
+                        break;
+                    }
+                }
+            }
+            
+            if (!played)
+            {
+                // 回到原始位置
+                ReturnToOriginalPosition();
+            }
+            
+            // 重置状态
+            ResetDragState();
+        }
+        
+        /// <summary>
+        /// 取消拖拽
+        /// </summary>
+        public void CancelDrag()
+        {
+            if (!isDragging) return;
+            
+            ReturnToOriginalPosition();
+            ResetDragState();
+        }
+        
+        /// <summary>
+        /// 注册出牌区域
+        /// </summary>
+        public void RegisterPlayArea(IPlayArea playArea)
+        {
+            if (!playAreas.Contains(playArea))
+            {
+                playAreas.Add(playArea);
+            }
+        }
+        
+        /// <summary>
+        /// 注销出牌区域
+        /// </summary>
+        public void UnregisterPlayArea(IPlayArea playArea)
+        {
+            playAreas.Remove(playArea);
+        }
+        
+        private void UpdateDragPosition()
+        {
+            if (mainCamera == null || draggedCard == null) return;
+            
+            Vector3 mousePosition = Input.mousePosition;
+            mousePosition.z = mainCamera.WorldToScreenPoint(draggedCard.transform.position).z;
+            Vector3 worldPosition = mainCamera.ScreenToWorldPoint(mousePosition);
+            
+            draggedCard.transform.position = worldPosition;
+        }
+        
+        private void CheckPlayArea()
+        {
+            if (draggedCard == null) return;
+            
+            // 高亮可出牌的区域
+            foreach (var playArea in playAreas)
+            {
+                bool canPlay = playArea.CanPlayCard(draggedCard);
+                playArea.SetHighlight(canPlay);
+            }
+        }
+        
+        private void ReturnToOriginalPosition()
+        {
+            if (draggedCard == null) return;
+            
+            draggedCard.transform.position = originalPosition;
+            draggedCard.transform.localScale = originalScale;
+            draggedCard.SetSelected(false);
+            
+            // 恢复渲染层级
+            var spriteRenderer = draggedCard.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.sortingOrder = originalSortingOrder;
+            }
+        }
+        
+        private void ResetDragState()
+        {
+            // 清除所有区域的高亮
+            foreach (var playArea in playAreas)
+            {
+                playArea.SetHighlight(false);
+            }
+            
+            isDragging = false;
+            draggedCard = null;
+        }
+    }
+    
+    /// <summary>
+    /// 出牌区域接口
+    /// </summary>
+    public interface IPlayArea
+    {
+        bool CanPlayCard(CardView cardView);
+        bool TryPlayCard(CardView cardView);
+        void SetHighlight(bool highlight);
+    }
+}

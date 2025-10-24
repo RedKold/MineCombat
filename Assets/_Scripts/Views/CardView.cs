@@ -67,12 +67,19 @@ namespace MineCombat
             Vector3 pos = new(transform.position.x, -2 , 0);
             CardViewHoverSystem.Instance.Show(Card, pos);
         }
-        
+
 
         void OnMouseExit()
         {
             CardViewHoverSystem.Instance.Hide();
             wrapper.SetActive(true);
         }
+
+        // 处理鼠标拖拽
+        void OnMouseDown()
+        {
+            
+        }
+        
     }
 }

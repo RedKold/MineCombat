@@ -49,6 +49,15 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
 
+    // 新增可覆盖的 Awake
+    protected virtual void Awake()
+    {
+        if (_instance == null)
+            _instance = this as T;
+        else if (_instance != this)
+            Destroy(gameObject);
+    }
+
     protected virtual void OnDestroy()
     {
         _applicationIsQuitting = true;

@@ -7,7 +7,7 @@ public class CardDatabaseSystem : Singleton<CardDatabaseSystem>
     private Dictionary<uint, Sprite> _cardImages = new();
     private Dictionary<string, Sprite> _costImages = new();
 
-    private void Awake()
+    protected override void Awake()
     {
         LoadCardImages();
         LoadCostImages();
