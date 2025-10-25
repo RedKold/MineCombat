@@ -1,6 +1,7 @@
 using UnityEngine;
 using MineCombat;
 using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 namespace MineCombat
 {
@@ -49,15 +50,22 @@ namespace MineCombat
         /// </summary>
         public void StartDrag(CardView cardView)
         {
-            if (isDragging) return;
+            if(!InteractionSystem.Instance.CanDrag())
+                return;
             
             draggedCard = cardView;
             isDragging = true;
             
             // 保存原始状态
+            InteractionSystem.Instance.BeginDrag();
+            
             originalPosition = cardView.transform.position;
             originalScale = cardView.transform.localScale;
-            
+
+
+            // 恢复旋转状态到不旋转
+            cardView.transform.rotation = Quaternion.identity;
+
             // 设置拖拽状态
             cardView.transform.localScale = originalScale * dragScale;
             cardView.SetSelected(true);
@@ -79,6 +87,7 @@ namespace MineCombat
         public void EndDrag()
         {
             if (!isDragging || draggedCard == null) return;
+
             
             bool played = false;
             
@@ -101,9 +110,13 @@ namespace MineCombat
                 // 回到原始位置
                 ReturnToOriginalPosition();
             }
-            
+
             // 重置状态
             ResetDragState();
+            
+            
+            // 通知交互系统
+            InteractionSystem.Instance.EndDrag();
         }
         
         /// <summary>
@@ -138,6 +151,8 @@ namespace MineCombat
         
         private void UpdateDragPosition()
         {
+            Assert.IsNotNull(mainCamera, "Main Camera is null in CardDragSystem");
+            Assert.IsNotNull(draggedCard, "Dragged Card is null in CardDragSystem");
             if (mainCamera == null || draggedCard == null) return;
             
             Vector3 mousePosition = Input.mousePosition;

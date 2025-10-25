@@ -3,6 +3,8 @@ using TMPro;
 using MineCombat;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
+using UnityEngine.AI;
+using System.Numerics;
 namespace MineCombat
 {
     public class CardView : MonoBehaviour
@@ -42,7 +44,7 @@ namespace MineCombat
         public void SetSelected(bool selected)
         {
             float alpha = selected ? 1f : 0.5f;
-            Vector3 scale = selected ? Vector3.one * 1.2f : Vector3.one;
+            UnityEngine.Vector3 scale = selected ? UnityEngine.Vector3.one * 1.2f : UnityEngine.Vector3.one;
 
             if (image != null) image.color = new Color(1f, 1f, 1f, alpha);
             if (cost != null) cost.color = new Color(1f, 1f, 1f, alpha);
@@ -51,7 +53,7 @@ namespace MineCombat
 
             // make sure the card is rendered above others when selected
             // Z 坐标偏移实现置顶
-            Vector3 pos = transform.localPosition;
+            UnityEngine.Vector3 pos = transform.localPosition;
             pos.z = selected ? -1f : 0f;  // 负 Z 靠近相机，高于 0 的其他物体
             transform.localPosition = pos;
         }
@@ -62,22 +64,44 @@ namespace MineCombat
             wrapper.SetActive(show);
         }
 
-        
+
         // 处理悬停鼠标方法
 
         // 用 EventSystem 悬停接口替换 OnMouseEnter/Exit
-        public void OnPointerEnter(PointerEventData eventData)
+        void OnMouseEnter()
         {
-            if (CardDragSystem.Instance.IsDragging) return;
-            wrapper.SetActive(false);
-            Vector3 pos = new(transform.position.x, -2, 0);
-            CardViewHoverSystem.Instance.Show(Card, pos);
+            if (!InteractionSystem.Instance.CanHover()) return;
+
+            InteractionSystem.Instance.BeginHover();
+
+            // 关闭原来卡牌视图的显示，避免重叠
+            ShowWrapper(false);
+            UnityEngine.Vector3 hoverPos = transform.position + UnityEngine.Vector3.up * 1.5f;
+            CardViewHoverSystem.Instance.Show(Card, hoverPos);
         }
 
-        public void OnPointerExit(PointerEventData eventData)
+        void OnMouseExit()
         {
+            InteractionSystem.Instance.EndHover();
+            
             CardViewHoverSystem.Instance.Hide();
-            wrapper.SetActive(true);
+            ShowWrapper(true);
+        }
+
+        void OnMouseDown()
+        {
+            if(!InteractionSystem.Instance.CanDrag())
+            {
+                Debug.Log("Cannot drag card due to interaction lock.");
+                return;
+            }
+            ShowWrapper(true);
+            CardDragSystem.Instance.StartDrag(this);
+        }
+
+        void OnMouseUp()
+        {
+            CardDragSystem.Instance.EndDrag();
         }
 
     }

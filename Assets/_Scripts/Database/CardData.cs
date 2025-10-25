@@ -9,7 +9,7 @@ public class CardData : ScriptableObject
     public string rarity;
     public string target;
     public string commands;
-    public int cost;
+    public byte cost;
     public bool Xcost;
 
     [field: SerializeField] public Sprite Image { get; private set; }
