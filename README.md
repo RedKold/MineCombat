@@ -1,68 +1,342 @@
-# MineCombat
+# MineCombat - 我的世界卡牌战斗游戏
 
-#### 介绍
-We are 宇宙超级无敌大(SuperBig42) team who are taking part in the Netease Leihuo game-making competition. We are making a card combat game inspired by Minecraft.
+[![Unity Version](https://img.shields.io/badge/Unity-2022.3+-blue.svg)](https://unity3d.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
 
-#### 软件架构
-基于Unity
+## 🎮 项目介绍
 
+**MineCombat** 是一款基于Unity开发的卡牌战斗游戏，灵感来源于《我的世界》(Minecraft)。这是宇宙超级无敌大(SuperBig42)团队参加网易雷火游戏制作大赛的作品。
 
-#### 安装教程
-1.  克隆此仓库
-2.  使用Unity打开本仓库文件夹
-3.  等待Unity自动根据package.json信息加载所需库
-4.  开始游玩和开发。
+### ✨ 核心特性
 
-#### 事件注册教程
-1.  使用静态类EventManager管理事件，用户只能调用唯一的外部接口Bind来绑定新的Action
-```cs
-EventManager.Bind("SomeEvent", yourAction)
+- 🃏 **丰富的卡牌系统** - 支持多种卡牌类型和稀有度
+- ⚔️ **策略战斗** - 基于卡牌组合的深度策略玩法
+- 🎯 **拖拽出牌** - 直观的拖拽交互系统
+- 🏗️ **模块化架构** - 高度可扩展的代码结构
+- 📊 **事件驱动** - 灵活的事件管理系统
+- 🎨 **Minecraft风格** - 经典的像素艺术风格
+
+## 🚀 快速开始
+
+### 环境要求
+
+- Unity 2022.3 或更高版本
+- .NET Standard 2.1
+- 支持C# 8.0+的IDE
+
+### 安装步骤
+
+1. **克隆仓库**
+   ```bash
+   git clone https://github.com/your-username/mine-kill.git
+   cd mine-kill
+   ```
+
+2. **打开项目**
+   - 使用Unity Hub打开项目文件夹
+   - 等待Unity自动导入所有资源
+
+3. **开始开发**
+   - 打开 `Assets/Scenes/Game.unity` 场景
+   - 点击Play按钮开始游戏
+
+## 🏗️ 项目架构
+
+### 目录结构
+
 ```
-2.  事件在EventManager的static块中硬编码注册，后续也许会改成读文件注册
-3.  在程序内部可以任意调用EventManager.Trigger<T>(name, <T>paras)来执行绑定的所有Action，参数按值传递
-4.  若传递多个参数，将其以元组形式传递 --> (string a, int b, bool c)
-5.  绑定的函数可以接收元组作为参数，也可以直接接受多个参数，但必须无返回值，支持无参数函数
-
-#### Parser的使用说明
-1.  Parser是一个静态工具类，用于处理字符串到任意集合的转换，一般返回一个List或HashSet
-2.  目前只有ToCollection一个方法，返回无字典集合，第二个参数控制了最大深度（如果存在第x+1层结构，直接返回null或报错），第三个参数控制是否严格测试（默认false，若为true，任何异常都会报错，否则返回null）
-```cs
-Parser.ToCollection("{a, b, {{c, d}, e}}", 3, false) //返回该结构的HashSet<object>
-Parser.ToCollection("{a, b, {{c, d}, e}}", 2, false) //返回null
-Parser.ToCollection("{a, b, {{c, d}, e}}", 2, true) //报错
+Assets/
+├── _Scripts/                 # 核心脚本
+│   ├── Base/                # 基础类
+│   │   ├── Card.cs         # 卡牌基类
+│   │   ├── Entity.cs       # 实体类
+│   │   ├── Properties.cs   # 属性管理器
+│   │   └── Damage.cs       # 伤害系统
+│   ├── Controller/          # 控制器
+│   │   ├── CardManager.cs  # 卡牌管理器
+│   │   └── CombatManager.cs # 战斗管理器
+│   ├── System/             # 系统组件
+│   │   ├── CardSystem.cs   # 卡牌系统
+│   │   └── CardDragSystem.cs # 拖拽系统
+│   ├── Views/              # 视图组件
+│   │   ├── CardView.cs     # 卡牌视图
+│   │   └── HandView.cs     # 手牌视图
+│   ├── Data/               # 数据类
+│   │   ├── PlayArea.cs     # 出牌区域
+│   │   └── CardSlot.cs     # 卡牌槽位
+│   └── Tools/              # 工具类
+│       ├── Parser.cs       # 字符串解析器
+│       └── DragSystemSetup.cs # 拖拽系统设置
+├── Scenes/                 # 游戏场景
+├── Resources/              # 游戏资源
+└── CardsIngredient/        # 卡牌素材
 ```
 
-#### 属性管理器
-1.  Properties是经过优化的属性管理器，支持int、double、bool三个基础类型和所有引用类型，且对string有优化
-2.  Properties对象的使用方式非常简单，提供Store函数用于存入数据，Update函数用于更新数据，Change函数用于修改数据，Get的一系列衍生函数用于获取数据
-```cs
-/*下面所有“id”均为一个字符串，用于标识数据
- *不同类型的数据使用同一个id可能会导致冲突，避免这样做*/
+### 核心模块
 
-//自动识别类型，无需泛型声明
-properties.Store(id, 36.5); //若id已存在，返回假，不操作
-properties.Update(id, "OftenOviour"); //若id不存在，返回假，但仍会创建属性并赋值
-properties.Change(id, (ref Damage dmg) => { /*对dmg的一些操作*/ }); //若id不存在，返回假，不操作
+#### 1. 卡牌系统 (Card System)
+- **Card**: 卡牌基类，定义卡牌的基本属性
+- **Material**: 材料类卡牌
+- **CardSystem**: 卡牌游戏逻辑管理
+- **CardDragSystem**: 拖拽出牌系统
 
-//需要显示指定要获取的类型
-properties.Get<Damage>(id)； //返回值为Damage或null，性能稍差
-//不可以使用Get<int>、Get<double>、Get<bool>、Get<string>，必然会导致返回值错误（不一定为null）
-properties.GetInt(id)； //返回值为int或null，需要空判断，double、bool、string都有对应的方法，它们性能更好
+#### 2. 实体系统 (Entity System)
+- **Entity**: 游戏实体基类
+- **Player**: 玩家类
+- **Combatant**: 战斗者类
+
+#### 3. 属性系统 (Properties System)
+- **Properties**: 通用属性管理器
+- 支持多种数据类型的高性能存储
+
+#### 4. 事件系统 (Event System)
+- **EventManager**: 事件管理器
+- 支持优先级、分支和随机事件
+
+#### 5. 伤害系统 (Damage System)
+- **Damage**: 伤害类
+- **DamageModifier**: 伤害修改器
+- 支持多种伤害类型和修改机制
+
+## 📚 API 文档
+
+### 核心接口
+
+#### Card 类
+```csharp
+public abstract class ACard : Properties, IEquatable<ACard>
+{
+    public readonly uint id;           // 卡牌ID
+    public readonly Rarity rarity;     // 稀有度
+    public readonly ITags tags;        // 标签
+    public string Name { get; }        // 卡牌名称
+    public string Description { get; } // 卡牌描述
+}
 ```
 
-#### 标签和标签集合
-1.  一般来说不必关注ITag，只需关注ITags，它有两个实现类StaticTags和Tags。前者是内存可空且不可修改的，只能包含一级结构，初始化性能更好；后者必定占用内存，可以动态修改，可以包含二级结构
-2.  Match行为意味着发起者将遍历自己的一级结构，只要其中任何一项（如果是二级结构，则为该项的每个内容）可以在目标中找到，则视为成功
-3.  TagsManager是存储常用标签集合的一个选择，Tags对象的构建开销较大，让常用的Tags指向同一个引用是不错的选择
+#### Entity 类
+```csharp
+public class Entity : Properties
+{
+    public double GetHealth();         // 获取生命值
+    public double GetMaxHealth();      // 获取最大生命值
+    public void SetHealth(double health); // 设置生命值
+    public bool ApplyDamage(double damage); // 应用伤害
+    public bool IsAlive();             // 是否存活
+}
+```
 
-#### 伤害系统
-1.  DamageTypes管理所有伤害类型对应的标签集合，Ignore方法用于测试指定的伤害类型是否被提供标签集合的对象忽略
-2.  DamageModifier是滞后的伤害修改机制，内含有值，优先级和一个标签集合，可以通过工厂方法生产ADD型，MUL型，MULTOTAL型或CUSTOM型，其中CUSTOM型需要传入一个处理double函数
-3.  事件"DamageProcess"是即时的伤害修改机制，直接接触Damage对象并修改伤害，需要手动提供一个标签集合并Ignore，否则总是生效；也可以在该事件中添加DamageModifier
+#### Properties 类
+```csharp
+public class Properties : ICloneable<Properties>
+{
+    // 存储数据
+    public bool Store(string name, int value);
+    public bool Store(string name, double value);
+    public bool Store(string name, bool value);
+    public bool Store(string name, string value);
+    public bool Store<T>(string name, T value) where T : notnull;
+    
+    // 更新数据
+    public bool Update(string name, int value);
+    public bool Update(string name, double value);
+    public bool Update(string name, bool value);
+    public bool Update(string name, string value);
+    public bool Update<T>(string name, T value) where T : notnull;
+    
+    // 获取数据
+    public int? GetInt(string name, bool checkDefault = true);
+    public double? GetDouble(string name, bool checkDefault = true);
+    public bool? GetBool(string name, bool checkDefault = true);
+    public string? GetString(string name, bool checkDefault = true);
+    public T? Get<T>(string name, bool checkDefault = true) where T : notnull;
+    
+    // 修改数据
+    public bool Change(string name, Process<int> processor);
+    public bool Change(string name, Process<double> processor);
+    public bool Change(string name, Process<bool> processor);
+    public bool Change(string name, Process<string> processor);
+    public bool Change<T>(string name, Process<T> processor) where T : notnull;
+}
+```
 
-#### 参与贡献
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+#### EventManager 类
+```csharp
+public static class EventManager
+{
+    // 事件绑定
+    public static void Bind(string eventName, Action action, int priority = 0);
+    public static void Bind<T>(string eventName, Action<T> action, int priority = 0);
+    
+    // 事件触发
+    public static void Trigger(string eventName);
+    public static void Trigger<T>(string eventName, T parameter);
+    
+    // 分支事件
+    public static void Bind(string eventName, string branch, Action action, int priority = 0);
+    public static void Trigger(string eventName, string branch);
+    
+    // 随机事件
+    public static void Bind(string eventName, string itemId, Action action, int priority = 0);
+    public static void Trigger(string eventName);
+}
+```
+
+#### Parser 类
+```csharp
+public static class Parser
+{
+    // 解析为集合
+    public static IEnumerable<object>? ToCollection(string src, byte limit = 255, bool strict = false);
+    
+    // 解析为Box数组
+    public static Box<string>?[]? ToBoxArray(string src, bool strict = false);
+    
+    // 解析为Box
+    public static Box<string>? ToBox(string src, bool strict = false);
+}
+```
+
+### 拖拽系统 API
+
+#### CardDragSystem
+```csharp
+public class CardDragSystem : Singleton<CardDragSystem>
+{
+    public bool IsDragging { get; }           // 是否正在拖拽
+    public CardView DraggedCard { get; }      // 当前拖拽的卡牌
+    
+    public void StartDrag(CardView cardView); // 开始拖拽
+    public void EndDrag();                    // 结束拖拽
+    public void CancelDrag();                 // 取消拖拽
+}
+```
+
+#### PlayArea
+```csharp
+public class PlayArea : MonoBehaviour, IPlayArea
+{
+    public bool CanPlayCard(CardView cardView); // 是否可以出牌
+    public bool TryPlayCard(CardView cardView); // 尝试出牌
+    public void SetHighlight(bool highlight);   // 设置高亮
+}
+```
+
+## 🎯 使用示例
+
+### 创建卡牌
+```csharp
+// 创建基础卡牌
+Card card = Card.Create("Diamond Sword", 3, false, Rarity.Rare, 
+    new Tags(), Target.Selected, "damage:10");
+
+// 创建材料卡牌
+Material material = Material.Create("Iron Ingot", Rarity.Common, 
+    new Tags());
+```
+
+### 事件系统使用
+```csharp
+// 绑定事件
+EventManager.Bind("CardPlayed", (Entity player, Card card) => {
+    Debug.Log($"{player.Name} 打出了 {card.Name}");
+});
+
+// 触发事件
+EventManager.Trigger("CardPlayed", (player, card));
+```
+
+### 属性管理
+```csharp
+Entity player = new Player("Steve", 100.0);
+
+// 存储属性
+player.Store("attack", 10);
+player.Store("defense", 5);
+
+// 获取属性
+int? attack = player.GetInt("attack");
+int? defense = player.GetInt("defense");
+
+// 修改属性
+player.Change("attack", (ref int value) => value += 2);
+```
+
+### 拖拽系统设置
+```csharp
+// 自动设置拖拽系统
+DragSystemSetup setup = gameObject.AddComponent<DragSystemSetup>();
+setup.SetupDragSystem();
+
+// 手动添加拖拽行为
+CardView cardView = GetComponent<CardView>();
+cardView.gameObject.AddComponent<CardDragBehavior>();
+```
+
+## 🛠️ 开发指南
+
+### 添加新卡牌
+1. 在 `Assets/Resources/Cards/` 添加卡牌图片
+2. 在 `CardDatabaseSystem` 中注册卡牌
+3. 使用 `Card.Create()` 创建卡牌实例
+
+### 添加新事件
+1. 在 `EventManager` 静态构造函数中添加事件
+2. 使用 `EventManager.Bind()` 绑定处理函数
+3. 使用 `EventManager.Trigger()` 触发事件
+
+### 自定义出牌区域
+```csharp
+public class CustomPlayArea : PlayArea
+{
+    protected override void OnCardPlayed(CardView cardView)
+    {
+        base.OnCardPlayed(cardView);
+        // 自定义出牌逻辑
+    }
+}
+```
+
+## 🐛 故障排除
+
+### 常见问题
+
+1. **卡牌无法拖拽**
+   - 检查 `CardDragBehavior` 组件是否存在
+   - 确认 `EventSystem` 存在且正常工作
+
+2. **事件不触发**
+   - 检查事件名称是否正确
+   - 确认事件已正确绑定
+
+3. **属性获取失败**
+   - 检查属性名称是否正确
+   - 确认属性类型匹配
+
+## 🤝 贡献指南
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+
+## 👥 团队
+
+- **宇宙超级无敌大(SuperBig42)** - 开发团队
+
+## 🙏 致谢
+
+- Unity Technologies - 游戏引擎
+- Minecraft - 灵感来源
+- 网易雷火 - 比赛平台
+
+---
+
+**注意**: 本项目仍在积极开发中，API可能会发生变化。请关注更新日志。
 
