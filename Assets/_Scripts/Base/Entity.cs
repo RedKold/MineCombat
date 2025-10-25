@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using static MineCombat.EventManager;
 
 namespace MineCombat
@@ -149,6 +151,13 @@ namespace MineCombat
             Card card = Inventory[index];
             Events.Trigger("CardDurabilityDamaged", (card, (uint)1));
             CombatManager.Play(this, card, targets);
+        }
+
+
+        public override void Die()
+        {
+            UnityEngine.Debug.Log("The Player " + this.Name + "is Dead");
+            Events.Trigger("CombatantDied", this);
         }
 #nullable disable
     }

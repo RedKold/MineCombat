@@ -1268,8 +1268,8 @@ namespace MineCombat
             RandomEvents.Add("TestRandomEvent1", new RandomEvent());
 
             // empty events.
-            Events.Add("CombatantDied", new PriorityEvent<Combatant>());
-            Events.Add("HealthChanged", new PriorityEvent<Combatant>());
+            Events.Add("CombatantDied", new PriorityEvent<Player>());
+            Events.Add("HealthChanged", new PriorityEvent<Player>());
 
             //打出一张牌
             Events.Add("CardDurabilityDamaged", new PriorityEvent<(Card, uint)>(null, ((Card, uint) tuple) => {

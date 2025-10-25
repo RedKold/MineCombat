@@ -49,9 +49,9 @@ public static class ModLoder
         RandomEvents["TestRandomEvent1"].CreateItem("volcanic-eruption", 5, () => { Debug.Log("随机事件：火山爆发"); });
 
         // 注册事件
-        Events["CombatantDied"].Bind(new Action<Combatant>(c =>
+        Events["CombatantDied"].Bind(new Action<Player>(c =>
         {
-            var view = CombatantView.AllViews.Find(v => v._combatant == c);
+            var view = CombatantView.AllViews.Find(v => v.player == c);
             Debug.Log("Finding view for " + c.Name);
             if (view != null)
             {
@@ -62,9 +62,9 @@ public static class ModLoder
             Assert.IsNotNull(view, "CombatantView should not be null on CombatantDied event");
         }));
 
-        Events["HealthChanged"].Bind(new Action<Combatant>(c =>
+        Events["HealthChanged"].Bind(new Action<Player>(c =>
         {
-            var view = CombatantView.AllViews.Find(v => v._combatant == c);
+            var view = CombatantView.AllViews.Find(v => v.player == c);
             if (view != null)
             {
                 view.UpdateHealthDisplay();

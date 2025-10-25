@@ -86,7 +86,7 @@ namespace MineCombat
         internal IReadOnlyList<Box<string>?> Commands => Array.AsReadOnly(_commands);
 
         // 卡牌的描述信息
-        public string Description => data != null ? data.Description : string.Empty;
+        public new string Description => data != null ? data.Description : string.Empty;
 
         // Judge data is null or not;
         private readonly CardData? data;

@@ -8,11 +8,12 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private Transform viewParent;              // 父物体，用于组织层级
 
     [Header("战斗者配置")]
-    [SerializeField] private int combatantCount = 2;            // 战斗者数量
-    [SerializeField] private float spacing = 100f;                // 战斗者间距
-    [SerializeField] private Sprite[] combatantSprites;         // 可选角色贴图
+    [SerializeField] private int playerCount = 1;            // 玩家数量
+    [SerializeField] private int enemyCount = 1;             // 敌人数量
+    [SerializeField] private float spacing = 100f;           // 战斗者间距
+    [SerializeField] private Sprite[] combatantSprites;      // 可选角色贴图
 
-    private Combatant[] combatants;
+    private Player[] players;
 
     void Start()
     {
@@ -22,29 +23,29 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        // 1️⃣ 初始化战斗者数据
-        combatants = new Combatant[combatantCount];
-        combatants[0] = new Combatant("Hero (Player)", 100.0);
-        combatants[1] = new Combatant("Creeper (Enemy)", 75.0);
+        int combatantCount = playerCount + enemyCount;
+        players = new Player[combatantCount];
 
-        // 2️⃣ 居中排列计算
+        // 初始化玩家和敌人
+        players[0] = new Player("Hero (Player)", 100.0);
+        players[1] = new Player("Creeper (Enemy)", 75.0);
+
+        // 居中排列计算
         float totalWidth = (combatantCount - 1) * spacing;
         float startX = -totalWidth / 2f;
 
         for (int i = 0; i < combatantCount; i++)
         {
-            // 局部位置相对于父物体
             Vector3 localPos = new Vector3(startX + i * spacing, 0f, 0f);
 
-            // 3️⃣ 实例化 CombatantView，挂载到父物体
             CombatantView view = Instantiate(combatantViewPrefab, viewParent);
-            view.transform.localPosition = localPos; // 相对父物体定位
+            view.transform.localPosition = localPos;
             view.transform.localRotation = Quaternion.identity;
 
-            // 绑定数据
-            view.BindCombatant(combatants[i]);
+            // 绑定 Player 数据
+            view.BindPlayer(players[i]);
 
-            // 可选：设置角色贴图
+            // 可选设置贴图
             if (combatantSprites != null && i < combatantSprites.Length)
             {
                 SpriteRenderer sr = view.GetComponentInChildren<SpriteRenderer>();
@@ -52,17 +53,17 @@ public class CombatManager : MonoBehaviour
             }
         }
 
-        // 4️⃣ 模拟受伤测试
+        // 测试受伤
         Invoke(nameof(SimulateDamage), 2f);
     }
 
     private void SimulateDamage()
     {
-        if (combatants.Length > 0)
+        if (players.Length > 0)
         {
             Damage fireDamage = new Damage("mc_fire", 120.0);
-            combatants[0].TakeDamage(fireDamage);
-            Debug.Log($"🔥 {combatants[0].Name} 受到火焰伤害，当前 HP: {combatants[0].CurHP}/{combatants[0].MaxHP}");
+            players[0].ApplyDamage(fireDamage.Get());
+            Debug.Log($"🔥 {players[0].Name} 受到火焰伤害，当前 HP: {players[0].GetHealth()}/{players[0].GetMaxHealth()}");
         }
     }
 }

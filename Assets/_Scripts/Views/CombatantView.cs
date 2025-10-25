@@ -1,11 +1,10 @@
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using MineCombat;
 using static MineCombat.EventManager;
-using System.Collections.Generic;
-
+using Unity.VisualScripting;
 
 public class CombatantView : MonoBehaviour
 {
@@ -14,61 +13,60 @@ public class CombatantView : MonoBehaviour
     [SerializeField] private SpriteRenderer healthBar;
     [SerializeField] private SpriteRenderer avatar;
 
+    // 数据类改为 Player
+    public Player player { get; private set; }
+
     public static List<CombatantView> AllViews = new List<CombatantView>();
+    private float _displayedHealthRatio = 1f;  // 当前显示的血量比例（用于平滑动画）
 
-
-    // Maintain the List
-     private void Awake()
+    private void Awake()
     {
-        // 添加到全局列表
         if (!AllViews.Contains(this))
             AllViews.Add(this);
     }
 
     private void OnDestroy()
     {
-        // 移除（防止引用已销毁对象）
         AllViews.Remove(this);
     }
-    public Combatant _combatant{ get; private set; }
-    private float _displayedHealthRatio = 1f;  // 当前显示的血量比例（用于平滑动画）
 
-    public void BindCombatant(Combatant combatant)
+    /// <summary>
+    /// 绑定 Player 数据
+    /// </summary>
+    public void BindPlayer(Player p)
     {
-        _combatant = combatant;
+        player = p;
 
-        // 初始显示
-        SetCombatant(combatant.Name, combatant.CurHP, combatant.MaxHP, avatar != null ? avatar.sprite : null);
+        // 初始化显示
+        SetPlayer(player.Name, player.GetHealth(), player.GetMaxHealth(), avatar != null ? avatar.sprite : null);
 
-        
-        // Update initial health display
-        Debug.Log("Binding combatant view for " + combatant.Name);
-        UpdateHealthDisplay(); // 更新血条和文字
+
+        // 更新血条
+        UpdateHealthDisplay();
+        Debug.Log("Binding player view for " + player.Name);
     }
 
-    private void OnHealthChanged(Combatant c)
+    private void OnHealthChanged(Entity e)
     {
-        if (c == _combatant)
-        {
-            UpdateHealthDisplay(); // 刷新血条
-        }
+        if (e == player)
+            UpdateHealthDisplay();
     }
 
-    private void OnCombatantDied(Combatant c)
+    private void OnPlayerDied(Entity e)
     {
-        if (c == _combatant)
+        if (e == player)
         {
             SetSelected(false);
             ShowWrapper(false);
         }
     }
-    // 更新血条与血量文字
+
     public void UpdateHealthDisplay()
     {
-        if (_combatant == null) return;
+        if (player == null) return;
 
-        double health = _combatant.CurHP;
-        double maxHealth = _combatant.MaxHP;
+        double health = player.GetHealth();
+        double maxHealth = player.GetMaxHealth();
 
         if (healthText != null)
             healthText.text = $"{health}/{maxHealth}";
@@ -81,12 +79,11 @@ public class CombatantView : MonoBehaviour
         }
     }
 
-    // 平滑动画更新血条宽度
     private IEnumerator SmoothHealthBar(float targetRatio)
     {
         float start = _displayedHealthRatio;
         float elapsed = 0f;
-        float duration = 0.3f; // 动画时间（秒）
+        float duration = 0.3f;
 
         while (elapsed < duration)
         {
@@ -101,8 +98,7 @@ public class CombatantView : MonoBehaviour
         healthBar.transform.localScale = new Vector3(_displayedHealthRatio, 1f, 1f);
     }
 
-    // 初始化战斗者信息
-    public void SetCombatant(string name, double health, double maxHealth, Sprite avatarSprite)
+    public void SetPlayer(string name, double health, double maxHealth, Sprite avatarSprite)
     {
         if (nameText != null) nameText.text = name;
         if (healthText != null) healthText.text = $"{health}/{maxHealth}";
@@ -116,7 +112,6 @@ public class CombatantView : MonoBehaviour
         }
     }
 
-    // 高亮显示
     public void SetSelected(bool selected)
     {
         float alpha = selected ? 1f : 0.5f;
@@ -132,8 +127,6 @@ public class CombatantView : MonoBehaviour
         transform.localPosition = pos;
     }
 
-
-    
     public void ShowWrapper(bool show)
     {
         gameObject.SetActive(show);

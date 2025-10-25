@@ -61,6 +61,7 @@ namespace MineCombat
             handView = fromHand;
             isDragging = true;
 
+        Debug.Log("Removing card from hand view.");
             // 保存原始状态
             InteractionSystem.Instance.BeginDrag();
 
@@ -98,15 +99,38 @@ namespace MineCombat
             bool played = false;
 
             // 检查是否在出牌区域内
-            foreach (var playArea in playAreas)
+            // foreach (var playArea in playAreas)
+            // {
+            //     if (playArea.CanPlayCard(draggedCard))
+            //     {
+            //         if (playArea.TryPlayCard(draggedCard))
+            //         {
+            //             played = true;
+            //             Debug.Log($"成功出牌: {draggedCard.Card?.Name}");
+            //             break;
+            //         }
+            //     }
+            // }
+
+            Debug.DrawRay(draggedCard.transform.position, Vector3.forward * 10, Color.red, 1f);
+
+            // Try our way to check if the card is played. use Ray
+            if(Physics.Raycast(draggedCard.transform.position, Vector3.forward, out RaycastHit hitInfo, 10f, playAreaLayer))
             {
-                if (playArea.CanPlayCard(draggedCard))
+                Debug.Log($"Raycast hit: {hitInfo.collider.name}");
+                IPlayArea playArea = hitInfo.collider.GetComponent<IPlayArea>();
+                Assert.IsNotNull(playArea, "PlayArea component not found on hit collider.");
+                if(playArea != null && playArea.CanPlayCard(draggedCard))
                 {
-                    if (playArea.TryPlayCard(draggedCard))
+                    if(playArea.TryPlayCard(draggedCard))
                     {
                         played = true;
                         Debug.Log($"成功出牌: {draggedCard.Card?.Name}");
-                        break;
+
+                        // Remove the card from hand view
+                        // 广播
+                        Assert.IsNotNull(handView, "HandView is null when trying to remove played card.");
+                        handView.StartCoroutine(handView.RemoveCard(draggedCard));
                     }
                 }
             }
@@ -118,6 +142,7 @@ namespace MineCombat
                 ReturnToOriginalPosition();
             }
 
+            
             // 重置状态
             ResetDragState();
 

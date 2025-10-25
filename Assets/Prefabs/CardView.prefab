@@ -259,6 +259,9 @@ MonoBehaviour:
   image: {fileID: 7730442469465545905}
   wrapper: {fileID: 1095713449415156909}
   dragger_behaviour: {fileID: 0}
+  playAreaLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!210 &8648515057982162357
 SortingGroup:
   m_ObjectHideFlags: 0

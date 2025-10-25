@@ -5,6 +5,7 @@ using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.AI;
 using System.Numerics;
+using Unity.VisualScripting;
 namespace MineCombat
 {
     public class CardView : MonoBehaviour
@@ -17,6 +18,11 @@ namespace MineCombat
         [SerializeField] private GameObject wrapper;
 
         [SerializeField] private GameObject dragger_behaviour;
+        [SerializeField] private LayerMask playAreaLayerMask;
+
+        // All cards need a player
+        [SerializeField] private Player _owner;
+        public Player Owner => _owner;
 
         public Card Card { get; private set; }
 
@@ -35,6 +41,8 @@ namespace MineCombat
             Card = card;
             title.text = card.Name;
             // description.text = CardDatabaseSystem.Instance.GetCardDescription(card); 
+            // Assert if load Description failed    
+            Assert.IsNotNull(card.Description, $"Card description is null for card id: {card.id}");
             description.text = card.Description;
             image.sprite = CardDatabaseSystem.Instance.GetCardImage(card.id);
             cost.sprite = CardDatabaseSystem.Instance.GetCostImage(card.cost, card.Xcost);

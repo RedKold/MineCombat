@@ -14,7 +14,7 @@ public class HandView : MonoBehaviour
 
     public IEnumerator AddCard(CardView cardView)
     {
-        if(cardView == null)
+        if (cardView == null)
         {
             Debug.LogWarning("HandView AddCard called with null CardView.");
             yield return UpdateCardPositions(0.15f);
@@ -22,6 +22,25 @@ public class HandView : MonoBehaviour
         cards.Add(cardView);
         cardView.transform.SetParent(transform, false);
         yield return UpdateCardPositions(0.15f);
+    }
+
+    public IEnumerator RemoveCard(CardView cardView)
+    {
+        Debug.Log("Removing card from hand view.");
+        if (cards.Remove(cardView))
+        {
+            cardView.transform.SetParent(null);
+
+            // add some animation here if needed
+            Vector3 playPos = new Vector3(20, 0, cardView.transform.position.z);
+            cardView.transform.DOMove(playPos, 0.2f).SetEase(Ease.OutQuad);
+            Debug.Log("Card removed successfully.");
+            yield return UpdateCardPositions(0.15f);
+        }
+        else
+        {
+            Debug.LogWarning("HandView RemoveCard called with CardView not in hand.");
+        }
     }
 
     private IEnumerator UpdateCardPositions(float duration)
