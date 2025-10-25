@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using MineCombat;
 using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 namespace MineCombat
 {
     public class CardView : MonoBehaviour
@@ -12,6 +13,8 @@ namespace MineCombat
         [SerializeField] private SpriteRenderer image;
 
         [SerializeField] private GameObject wrapper;
+
+        [SerializeField] private GameObject dragger_behaviour;
 
         public Card Card { get; private set; }
 
@@ -61,25 +64,21 @@ namespace MineCombat
 
         
         // 处理悬停鼠标方法
-        void OnMouseEnter()
+
+        // 用 EventSystem 悬停接口替换 OnMouseEnter/Exit
+        public void OnPointerEnter(PointerEventData eventData)
         {
+            if (CardDragSystem.Instance.IsDragging) return;
             wrapper.SetActive(false);
-            Vector3 pos = new(transform.position.x, -2 , 0);
+            Vector3 pos = new(transform.position.x, -2, 0);
             CardViewHoverSystem.Instance.Show(Card, pos);
         }
 
-
-        void OnMouseExit()
+        public void OnPointerExit(PointerEventData eventData)
         {
             CardViewHoverSystem.Instance.Hide();
             wrapper.SetActive(true);
         }
 
-        // 处理鼠标拖拽
-        void OnMouseDown()
-        {
-            
-        }
-        
     }
 }

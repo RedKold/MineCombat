@@ -255,9 +255,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   title: {fileID: 8139184413564582451}
   description: {fileID: 2988548431268390754}
-  wrapper: {fileID: 1095713449415156909}
   cost: {fileID: 373290201672233269}
   image: {fileID: 7730442469465545905}
+  wrapper: {fileID: 1095713449415156909}
+  dragger_behaviour: {fileID: 0}
 --- !u!210 &8648515057982162357
 SortingGroup:
   m_ObjectHideFlags: 0

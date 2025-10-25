@@ -2,6 +2,7 @@ using UnityEngine;
 
 // for we can create CardData assets in Unity Editor
 [CreateAssetMenu(menuName = "Database/Card")]
+
 public class CardData : ScriptableObject
 {
     public string Name;
