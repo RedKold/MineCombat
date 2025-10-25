@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -90,10 +90,7 @@ namespace MineCombat
 
     public interface IEvent { }
 
-    public interface IConstable<T> where T : IConstable<T>
-    {
-        public T ConstCast();
-    }
+
 
     public interface IPriorityEvent : IEvent, IConstable<AConstPriorityEvent>
     {
@@ -121,14 +118,14 @@ namespace MineCombat
         public void Bind<T1, T2, T3, T4, T5, T6, T7>(string branch, Action<T1, T2, T3, T4, T5, T6, T7> action, int priority = 0);
         public void Bind<T1, T2, T3, T4, T5, T6, T7, T8>(string branch, Action<T1, T2, T3, T4, T5, T6, T7, T8> action, int priority = 0);
         public void CreateBranch(string branch, Action? prepare = null, Action? finalize = null);
-        public void CreateBranch<T1>(string branch, Action<T1> prepare, Action<T1> finalize);
-        public void CreateBranch<T1, T2>(string branch, Action<T1, T2> prepare, Action<T1, T2> finalize);
-        public void CreateBranch<T1, T2, T3>(string branch, Action<T1, T2, T3> prepare, Action<T1, T2, T3> finalize);
-        public void CreateBranch<T1, T2, T3, T4>(string branch, Action<T1, T2, T3, T4> prepare, Action<T1, T2, T3, T4> finalize);
-        public void CreateBranch<T1, T2, T3, T4, T5>(string branch, Action<T1, T2, T3, T4, T5> prepare, Action<T1, T2, T3, T4, T5> finalize);
-        public void CreateBranch<T1, T2, T3, T4, T5, T6>(string branch, Action<T1, T2, T3, T4, T5, T6> prepare, Action<T1, T2, T3, T4, T5, T6> finalize);
-        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7>(string branch, Action<T1, T2, T3, T4, T5, T6, T7> prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize);
-        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7, T8>(string branch, Action<T1, T2, T3, T4, T5, T6, T7, T8> prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize);
+        public void CreateBranch<T1>(string branch, Action<T1>? prepare, Action<T1> finalize);
+        public void CreateBranch<T1, T2>(string branch, Action<T1, T2>? prepare, Action<T1, T2> finalize);
+        public void CreateBranch<T1, T2, T3>(string branch, Action<T1, T2, T3>? prepare, Action<T1, T2, T3> finalize);
+        public void CreateBranch<T1, T2, T3, T4>(string branch, Action<T1, T2, T3, T4>? prepare, Action<T1, T2, T3, T4> finalize);
+        public void CreateBranch<T1, T2, T3, T4, T5>(string branch, Action<T1, T2, T3, T4, T5>? prepare, Action<T1, T2, T3, T4, T5> finalize);
+        public void CreateBranch<T1, T2, T3, T4, T5, T6>(string branch, Action<T1, T2, T3, T4, T5, T6>? prepare, Action<T1, T2, T3, T4, T5, T6> finalize);
+        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7>(string branch, Action<T1, T2, T3, T4, T5, T6, T7>? prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize);
+        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7, T8>(string branch, Action<T1, T2, T3, T4, T5, T6, T7, T8>? prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize);
 #nullable disable
     }
 
@@ -145,14 +142,14 @@ namespace MineCombat
         public void Bind<T1, T2, T3, T4, T5, T6, T7>(string id, Action<T1, T2, T3, T4, T5, T6, T7> action, int priority = 0);
         public void Bind<T1, T2, T3, T4, T5, T6, T7, T8>(string id, Action<T1, T2, T3, T4, T5, T6, T7, T8> action, int priority = 0);
         public void CreateItem(string id, uint weight = 1024, Action? prepare = null, Action? finalize = null);
-        public void CreateItem<T1>(string id, uint weight, Action<T1> prepare, Action<T1> finalize);
-        public void CreateItem<T1, T2>(string id, uint weight, Action<T1, T2> prepare, Action<T1, T2> finalize);
-        public void CreateItem<T1, T2, T3>(string id, uint weight, Action<T1, T2, T3> prepare, Action<T1, T2, T3> finalize);
-        public void CreateItem<T1, T2, T3, T4>(string id, uint weight, Action<T1, T2, T3, T4> prepare, Action<T1, T2, T3, T4> finalize);
-        public void CreateItem<T1, T2, T3, T4, T5>(string id, uint weight, Action<T1, T2, T3, T4, T5> prepare, Action<T1, T2, T3, T4, T5> finalize);
-        public void CreateItem<T1, T2, T3, T4, T5, T6>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6> prepare, Action<T1, T2, T3, T4, T5, T6> finalize);
-        public void CreateItem<T1, T2, T3, T4, T5, T6, T7>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7> prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize);
-        public void CreateItem<T1, T2, T3, T4, T5, T6, T7, T8>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7, T8> prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize);
+        public void CreateItem<T1>(string id, uint weight, Action<T1>? prepare, Action<T1> finalize);
+        public void CreateItem<T1, T2>(string id, uint weight, Action<T1, T2>? prepare, Action<T1, T2> finalize);
+        public void CreateItem<T1, T2, T3>(string id, uint weight, Action<T1, T2, T3>? prepare, Action<T1, T2, T3> finalize);
+        public void CreateItem<T1, T2, T3, T4>(string id, uint weight, Action<T1, T2, T3, T4>? prepare, Action<T1, T2, T3, T4> finalize);
+        public void CreateItem<T1, T2, T3, T4, T5>(string id, uint weight, Action<T1, T2, T3, T4, T5>? prepare, Action<T1, T2, T3, T4, T5> finalize);
+        public void CreateItem<T1, T2, T3, T4, T5, T6>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6>? prepare, Action<T1, T2, T3, T4, T5, T6> finalize);
+        public void CreateItem<T1, T2, T3, T4, T5, T6, T7>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7>? prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize);
+        public void CreateItem<T1, T2, T3, T4, T5, T6, T7, T8>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7, T8>? prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize);
         public void SetWeight(string id, uint weight);
 #nullable disable
     }
@@ -268,42 +265,42 @@ namespace MineCombat
             throw new ArgumentException($"构建完成的静态事件无法创建新的分支");
         }
 
-        public void CreateBranch<T1>(string branch, Action<T1> prepare, Action<T1> finalize)
+        public void CreateBranch<T1>(string branch, Action<T1>? prepare, Action<T1> finalize)
         {
             throw new ArgumentException($"构建完成的静态事件无法创建新的分支");
         }
 
-        public void CreateBranch<T1, T2>(string branch, Action<T1, T2> prepare, Action<T1, T2> finalize)
+        public void CreateBranch<T1, T2>(string branch, Action<T1, T2>? prepare, Action<T1, T2> finalize)
         {
             throw new ArgumentException($"构建完成的静态事件无法创建新的分支");
         }
 
-        public void CreateBranch<T1, T2, T3>(string branch, Action<T1, T2, T3> prepare, Action<T1, T2, T3> finalize)
+        public void CreateBranch<T1, T2, T3>(string branch, Action<T1, T2, T3>? prepare, Action<T1, T2, T3> finalize)
         {
             throw new ArgumentException($"构建完成的静态事件无法创建新的分支");
         }
 
-        public void CreateBranch<T1, T2, T3, T4>(string branch, Action<T1, T2, T3, T4> prepare, Action<T1, T2, T3, T4> finalize)
+        public void CreateBranch<T1, T2, T3, T4>(string branch, Action<T1, T2, T3, T4>? prepare, Action<T1, T2, T3, T4> finalize)
         {
             throw new ArgumentException($"构建完成的静态事件无法创建新的分支");
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5>(string branch, Action<T1, T2, T3, T4, T5> prepare, Action<T1, T2, T3, T4, T5> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5>(string branch, Action<T1, T2, T3, T4, T5>? prepare, Action<T1, T2, T3, T4, T5> finalize)
         {
             throw new ArgumentException($"构建完成的静态事件无法创建新的分支");
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5, T6>(string branch, Action<T1, T2, T3, T4, T5, T6> prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5, T6>(string branch, Action<T1, T2, T3, T4, T5, T6>? prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
         {
             throw new ArgumentException($"构建完成的静态事件无法创建新的分支");
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7>(string branch, Action<T1, T2, T3, T4, T5, T6, T7> prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7>(string branch, Action<T1, T2, T3, T4, T5, T6, T7>? prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
         {
             throw new ArgumentException($"构建完成的静态事件无法创建新的分支");
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7, T8>(string branch, Action<T1, T2, T3, T4, T5, T6, T7, T8> prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7, T8>(string branch, Action<T1, T2, T3, T4, T5, T6, T7, T8>? prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
         {
             throw new ArgumentException($"构建完成的静态事件无法创建新的分支");
         }
@@ -368,42 +365,42 @@ namespace MineCombat
             throw new ArgumentException("构建完成的静态事件无法创建新的随机项");
         }
 
-        public void CreateItem<T1>(string id, uint weight, Action<T1> prepare, Action<T1> finalize)
+        public void CreateItem<T1>(string id, uint weight, Action<T1>? prepare, Action<T1> finalize)
         {
             throw new ArgumentException("构建完成的静态事件无法创建新的随机项");
         }
 
-        public void CreateItem<T1, T2>(string id, uint weight, Action<T1, T2> prepare, Action<T1, T2> finalize)
+        public void CreateItem<T1, T2>(string id, uint weight, Action<T1, T2>? prepare, Action<T1, T2> finalize)
         {
             throw new ArgumentException("构建完成的静态事件无法创建新的随机项");
         }
 
-        public void CreateItem<T1, T2, T3>(string id, uint weight, Action<T1, T2, T3> prepare, Action<T1, T2, T3> finalize)
+        public void CreateItem<T1, T2, T3>(string id, uint weight, Action<T1, T2, T3>? prepare, Action<T1, T2, T3> finalize)
         {
             throw new ArgumentException("构建完成的静态事件无法创建新的随机项");
         }
 
-        public void CreateItem<T1, T2, T3, T4>(string id, uint weight, Action<T1, T2, T3, T4> prepare, Action<T1, T2, T3, T4> finalize)
+        public void CreateItem<T1, T2, T3, T4>(string id, uint weight, Action<T1, T2, T3, T4>? prepare, Action<T1, T2, T3, T4> finalize)
         {
             throw new ArgumentException("构建完成的静态事件无法创建新的随机项");
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5>(string id, uint weight, Action<T1, T2, T3, T4, T5> prepare, Action<T1, T2, T3, T4, T5> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5>(string id, uint weight, Action<T1, T2, T3, T4, T5>? prepare, Action<T1, T2, T3, T4, T5> finalize)
         {
             throw new ArgumentException("构建完成的静态事件无法创建新的随机项");
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5, T6>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6> prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5, T6>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6>? prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
         {
             throw new ArgumentException("构建完成的静态事件无法创建新的随机项");
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5, T6, T7>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7> prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5, T6, T7>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7>? prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
         {
             throw new ArgumentException("构建完成的静态事件无法创建新的随机项");
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5, T6, T7, T8>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7, T8> prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5, T6, T7, T8>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7, T8>? prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
         {
             throw new ArgumentException("构建完成的静态事件无法创建新的随机项");
         }
@@ -499,10 +496,10 @@ namespace MineCombat
             _finalize = finalize;
         }
 
-        internal PriorityEvent(Delegate prepare, Delegate finalize)
+        internal PriorityEvent(Delegate? prepare, Delegate finalize)
         {
-            _prepare = TryTranslate(prepare);
-            _finalize = TryTranslate(prepare);
+            _prepare = prepare is null ? null : TryTranslate(prepare);
+            _finalize = TryTranslate(finalize);
         }
 
         public void Bind(Action action, int priority = 0)
@@ -623,42 +620,42 @@ namespace MineCombat
             _branches.Add(branch, new PriorityEvent(prepare, finalize));
         }
 
-        public void CreateBranch<T1>(string branch, Action<T1> prepare, Action<T1> finalize)
+        public void CreateBranch<T1>(string branch, Action<T1>? prepare, Action<T1> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateBranch<T1, T2>(string branch, Action<T1, T2> prepare, Action<T1, T2> finalize)
+        public void CreateBranch<T1, T2>(string branch, Action<T1, T2>? prepare, Action<T1, T2> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateBranch<T1, T2, T3>(string branch, Action<T1, T2, T3> prepare, Action<T1, T2, T3> finalize)
+        public void CreateBranch<T1, T2, T3>(string branch, Action<T1, T2, T3>? prepare, Action<T1, T2, T3> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateBranch<T1, T2, T3, T4>(string branch, Action<T1, T2, T3, T4> prepare, Action<T1, T2, T3, T4> finalize)
+        public void CreateBranch<T1, T2, T3, T4>(string branch, Action<T1, T2, T3, T4>? prepare, Action<T1, T2, T3, T4> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5>(string branch, Action<T1, T2, T3, T4, T5> prepare, Action<T1, T2, T3, T4, T5> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5>(string branch, Action<T1, T2, T3, T4, T5>? prepare, Action<T1, T2, T3, T4, T5> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5, T6>(string branch, Action<T1, T2, T3, T4, T5, T6> prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5, T6>(string branch, Action<T1, T2, T3, T4, T5, T6>? prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7>(string branch, Action<T1, T2, T3, T4, T5, T6, T7> prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7>(string branch, Action<T1, T2, T3, T4, T5, T6, T7>? prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7, T8>(string branch, Action<T1, T2, T3, T4, T5, T6, T7, T8> prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7, T8>(string branch, Action<T1, T2, T3, T4, T5, T6, T7, T8>? prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
@@ -753,56 +750,56 @@ namespace MineCombat
             _branches.Add(branch, new PriorityEvent<T>());
         }
 
-        public void CreateBranch<T1>(string branch, Action<T1> prepare, Action<T1> finalize)
+        public void CreateBranch<T1>(string branch, Action<T1>? prepare, Action<T1> finalize)
         {
             if (_branches.ContainsKey(branch))
                 throw new ArgumentException($"事件分支{branch}被重复创建");
             _branches.Add(branch, new PriorityEvent<T>(prepare, finalize));
         }
 
-        public void CreateBranch<T1, T2>(string branch, Action<T1, T2> prepare, Action<T1, T2> finalize)
+        public void CreateBranch<T1, T2>(string branch, Action<T1, T2>? prepare, Action<T1, T2> finalize)
         {
             if (_branches.ContainsKey(branch))
                 throw new ArgumentException($"事件分支{branch}被重复创建");
             _branches.Add(branch, new PriorityEvent<T>(prepare, finalize));
         }
 
-        public void CreateBranch<T1, T2, T3>(string branch, Action<T1, T2, T3> prepare, Action<T1, T2, T3> finalize)
+        public void CreateBranch<T1, T2, T3>(string branch, Action<T1, T2, T3>? prepare, Action<T1, T2, T3> finalize)
         {
             if (_branches.ContainsKey(branch))
                 throw new ArgumentException($"事件分支{branch}被重复创建");
             _branches.Add(branch, new PriorityEvent<T>(prepare, finalize));
         }
 
-        public void CreateBranch<T1, T2, T3, T4>(string branch, Action<T1, T2, T3, T4> prepare, Action<T1, T2, T3, T4> finalize)
+        public void CreateBranch<T1, T2, T3, T4>(string branch, Action<T1, T2, T3, T4>? prepare, Action<T1, T2, T3, T4> finalize)
         {
             if (_branches.ContainsKey(branch))
                 throw new ArgumentException($"事件分支{branch}被重复创建");
             _branches.Add(branch, new PriorityEvent<T>(prepare, finalize));
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5>(string branch, Action<T1, T2, T3, T4, T5> prepare, Action<T1, T2, T3, T4, T5> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5>(string branch, Action<T1, T2, T3, T4, T5>? prepare, Action<T1, T2, T3, T4, T5> finalize)
         {
             if (_branches.ContainsKey(branch))
                 throw new ArgumentException($"事件分支{branch}被重复创建");
             _branches.Add(branch, new PriorityEvent<T>(prepare, finalize));
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5, T6>(string branch, Action<T1, T2, T3, T4, T5, T6> prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5, T6>(string branch, Action<T1, T2, T3, T4, T5, T6>? prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
         {
             if (_branches.ContainsKey(branch))
                 throw new ArgumentException($"事件分支{branch}被重复创建");
             _branches.Add(branch, new PriorityEvent<T>(prepare, finalize));
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7>(string branch, Action<T1, T2, T3, T4, T5, T6, T7> prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7>(string branch, Action<T1, T2, T3, T4, T5, T6, T7>? prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
         {
             if (_branches.ContainsKey(branch))
                 throw new ArgumentException($"事件分支{branch}被重复创建");
             _branches.Add(branch, new PriorityEvent<T>(prepare, finalize));
         }
 
-        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7, T8>(string branch, Action<T1, T2, T3, T4, T5, T6, T7, T8> prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
+        public void CreateBranch<T1, T2, T3, T4, T5, T6, T7, T8>(string branch, Action<T1, T2, T3, T4, T5, T6, T7, T8>? prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
         {
             if (_branches.ContainsKey(branch))
                 throw new ArgumentException($"事件分支{branch}被重复创建");
@@ -876,42 +873,42 @@ namespace MineCombat
             _items.Add(id, (new PriorityEvent(prepare, finalize), weight));
         }
 
-        public void CreateItem<T1>(string id, uint weight, Action<T1> prepare, Action<T1> finalize)
+        public void CreateItem<T1>(string id, uint weight, Action<T1>? prepare, Action<T1> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateItem<T1, T2>(string id, uint weight, Action<T1, T2> prepare, Action<T1, T2> finalize)
+        public void CreateItem<T1, T2>(string id, uint weight, Action<T1, T2>? prepare, Action<T1, T2> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateItem<T1, T2, T3>(string id, uint weight, Action<T1, T2, T3> prepare, Action<T1, T2, T3> finalize)
+        public void CreateItem<T1, T2, T3>(string id, uint weight, Action<T1, T2, T3>? prepare, Action<T1, T2, T3> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateItem<T1, T2, T3, T4>(string id, uint weight, Action<T1, T2, T3, T4> prepare, Action<T1, T2, T3, T4> finalize)
+        public void CreateItem<T1, T2, T3, T4>(string id, uint weight, Action<T1, T2, T3, T4>? prepare, Action<T1, T2, T3, T4> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5>(string id, uint weight, Action<T1, T2, T3, T4, T5> prepare, Action<T1, T2, T3, T4, T5> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5>(string id, uint weight, Action<T1, T2, T3, T4, T5>? prepare, Action<T1, T2, T3, T4, T5> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5, T6>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6> prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5, T6>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6>? prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5, T6, T7>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7> prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5, T6, T7>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7>? prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5, T6, T7, T8>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7, T8> prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5, T6, T7, T8>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7, T8>? prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
         {
             throw new ArgumentException("需要无参数的无返回值函数");
         }
@@ -1026,56 +1023,56 @@ namespace MineCombat
             _items.Add(id, (new PriorityEvent<T>(), weight));
         }
 
-        public void CreateItem<T1>(string id, uint weight, Action<T1> prepare, Action<T1> finalize)
+        public void CreateItem<T1>(string id, uint weight, Action<T1>? prepare, Action<T1> finalize)
         {
             if (_items.ContainsKey(id))
                 throw new ArgumentException($"事件分支{id}被重复创建");
             _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight));
         }
 
-        public void CreateItem<T1, T2>(string id, uint weight, Action<T1, T2> prepare, Action<T1, T2> finalize)
+        public void CreateItem<T1, T2>(string id, uint weight, Action<T1, T2>? prepare, Action<T1, T2> finalize)
         {
             if (_items.ContainsKey(id))
                 throw new ArgumentException($"事件分支{id}被重复创建");
             _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight));
         }
 
-        public void CreateItem<T1, T2, T3>(string id, uint weight, Action<T1, T2, T3> prepare, Action<T1, T2, T3> finalize)
+        public void CreateItem<T1, T2, T3>(string id, uint weight, Action<T1, T2, T3>? prepare, Action<T1, T2, T3> finalize)
         {
             if (_items.ContainsKey(id))
                 throw new ArgumentException($"事件分支{id}被重复创建");
             _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight));
         }
 
-        public void CreateItem<T1, T2, T3, T4>(string id, uint weight, Action<T1, T2, T3, T4> prepare, Action<T1, T2, T3, T4> finalize)
+        public void CreateItem<T1, T2, T3, T4>(string id, uint weight, Action<T1, T2, T3, T4>? prepare, Action<T1, T2, T3, T4> finalize)
         {
             if (_items.ContainsKey(id))
                 throw new ArgumentException($"事件分支{id}被重复创建");
             _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight));
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5>(string id, uint weight, Action<T1, T2, T3, T4, T5> prepare, Action<T1, T2, T3, T4, T5> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5>(string id, uint weight, Action<T1, T2, T3, T4, T5>? prepare, Action<T1, T2, T3, T4, T5> finalize)
         {
             if (_items.ContainsKey(id))
                 throw new ArgumentException($"事件分支{id}被重复创建");
             _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight));
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5, T6>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6> prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5, T6>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6>? prepare, Action<T1, T2, T3, T4, T5, T6> finalize)
         {
             if (_items.ContainsKey(id))
                 throw new ArgumentException($"事件分支{id}被重复创建");
             _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight));
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5, T6, T7>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7> prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5, T6, T7>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7>? prepare, Action<T1, T2, T3, T4, T5, T6, T7> finalize)
         {
             if (_items.ContainsKey(id))
                 throw new ArgumentException($"事件分支{id}被重复创建");
             _items.Add(id, (new PriorityEvent<T>(prepare, finalize), weight)); 
         }
 
-        public void CreateItem<T1, T2, T3, T4, T5, T6, T7, T8>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7, T8> prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
+        public void CreateItem<T1, T2, T3, T4, T5, T6, T7, T8>(string id, uint weight, Action<T1, T2, T3, T4, T5, T6, T7, T8>? prepare, Action<T1, T2, T3, T4, T5, T6, T7, T8> finalize)
         {
             if (_items.ContainsKey(id))
                 throw new ArgumentException($"事件分支{id}被重复创建");
@@ -1266,7 +1263,7 @@ namespace MineCombat
         {
             Events.Add("TestEvent1", new PriorityEvent());
             Events.Add("TestEvent2", new PriorityEvent<(string, string)>());
-            Events.Add("TestEvent3", new PriorityEvent<(int, int)>(item => { var(i1, i2) = item; Console.WriteLine($"i1 = {i1}, i2 = {i2}"); }, item => { var (i1, i2) = item; Console.WriteLine($"i1 = {i1}, i2 = {i2}"); }));
+            Events.Add("TestEvent3", new PriorityEvent<(int, int)>(item => { var(i1, i2) = item; Console.WriteLine($"开始时i1 = {i1}, i2 = {i2}"); }, item => { var (i1, i2) = item; Console.WriteLine($"结束时i1 = {i1}, i2 = {i2}"); }));
             SlicedEvents.Add("TestSlicedEvent1", new SlicedEvent());
             RandomEvents.Add("TestRandomEvent1", new RandomEvent());
 
@@ -1274,6 +1271,30 @@ namespace MineCombat
             Events.Add("CombatantDied", new PriorityEvent<Combatant>());
             Events.Add("HealthChanged", new PriorityEvent<Combatant>());
 
+            //打出一张牌
+            Events.Add("CardDurabilityDamaged", new PriorityEvent<(Card, uint)>(null, ((Card, uint) tuple) => {
+                var (card, damage) = tuple;
+                var max = card.GetInt("mc_card_durability_max");
+                if (max is null)
+                    return;
+                var d = card.GetDouble("mc_card_durability_damage");
+                int dmg = (int)damage;
+                if (d is not null)
+                {
+                    if (d > max)
+                        dmg = (int)max;
+                    else
+                    {
+                        dmg = (int)d;
+                        dmg = dmg + Randomizer.NextDouble() < (d - dmg) ? 1 : 0;
+                    }
+                }
+                card.Change("mc_card_durability", (ref int drb) => {
+                    drb -= dmg;
+                });
+            }));
+            SlicedEvents.Add("CardPlayed", new SlicedEvent<(Entity, Card, Box<Entity>, Context)>());
+            
             // Build constant events.
         }
     }

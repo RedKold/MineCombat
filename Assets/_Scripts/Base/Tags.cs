@@ -8,11 +8,6 @@ namespace MineCombat
     /* 注意：
      * 1.new Tags("...") != (Tags)"..."，后者会尝试解析字符串为一个集合，前者只会将字符串整体作为第一个ITag，对StaticTags同理
      * 2.(Tags)"" == new Tags("") != new Tags()，想要使用空的ITags，推荐使用StaticTags.Empty，可以有效节省开销 */
-    public interface IMatchable<T>
-    {
-        bool Match(T t);
-    }
-
     public interface ITag : IEquatable<ITag>, IMatchable<ITags>
     {
         bool Contains(string tag);
@@ -298,10 +293,10 @@ namespace MineCombat
         public static implicit operator ConstTags(string[] tags) => new ConstTags(tags);
         public static implicit operator ConstTags(string tags)
         {
-            IEnumerable<object>? collection = Parser.ToCollection(tags, 1);
+            var collection = Parser.ToCollection(tags, 1);
             if (collection?.Any() == true)
             {
-                List<string> strings = new();
+                HashSet<string> strings = new();
                 foreach (var item in collection)
                 {
                     if (item is string str)

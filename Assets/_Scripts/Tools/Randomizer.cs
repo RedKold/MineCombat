@@ -19,7 +19,7 @@ namespace MineCombat
 
     public class DynamicRandomizer<T> : IRandomizer<T>, IConstable<ConstRandomizer<T>> where T : notnull
     {
-        private static Random random = new();
+        private static Random _random = new();
         private static object _lock = new();
 
         private List<(T, uint)> _items;
@@ -52,7 +52,7 @@ namespace MineCombat
         {
             lock (_lock)
             {
-                l = random.NextInt64(0, _total);
+                l = _random.NextInt64(0, _total);
             }
         }
 
@@ -135,7 +135,7 @@ namespace MineCombat
 
     public class ConstRandomizer<T> : IRandomizer<T>, IConstable<ConstRandomizer<T>> where T : notnull
     {
-        private static Random random = new();
+        private static Random _random = new();
         private static object _lock = new();
 
         private T[] _items;
@@ -191,8 +191,8 @@ namespace MineCombat
         {
             lock (_lock)
             {
-                i = random.Next(0, _count);
-                l = random.NextInt64(0, _avg);
+                i = _random.Next(0, _count);
+                l = _random.NextInt64(0, _avg);
             }
         }
 
@@ -229,6 +229,39 @@ namespace MineCombat
 
     public static class Randomizer
     {
+        private static Random _random = new();
+        private static object _lock = new();
+
+        public static int Next()
+        {
+            lock (_lock)
+            {
+                return _random.Next();
+            }
+        }
+        public static int Next(int max)
+        {
+            lock (_lock)
+            {
+                return _random.Next(max);
+            }
+        }
+        public static int Next(int min, int max)
+        {
+            lock (_lock)
+            {
+                return _random.Next(min, max);
+            }
+        }
+
+        public static double NextDouble()
+        {
+            lock (_lock)
+            {
+                return _random.NextDouble();
+            }
+        }
+
         //暂时无法使用此功能，未完成开发
         public static DynamicRandomizer<T> Cross<T>(IRandomizer<T> a, IRandomizer<T> b, bool uniWeight = true) where T : IEquatable<T>
         {

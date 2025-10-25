@@ -50,14 +50,28 @@ namespace MineCombat
                 if (_keys.TryGetValue(key, out value))
                     return value;
 
-                _keys.Add(key, _nextValue++);
-                return _nextValue;
+                _keys.Add(key, _nextValue);
+                return _nextValue++;
             }
         }
 
         public bool IsValid(uint value)
         {
             return value > 0 && value < _nextValue;
+        }
+    }
+
+    //待完成
+    public class Translator<K, V> : ITranslator<K, V>
+    {
+        public bool IsValid(V value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public V Translate(K key)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -95,8 +109,8 @@ namespace MineCombat
                     return value;
 
                 _values.Add(_nextValue, key);
-                _keys.Add(key, _nextValue++);
-                return _nextValue;
+                _keys.Add(key, _nextValue);
+                return _nextValue++;
             }
         }
 
@@ -122,6 +136,7 @@ namespace MineCombat
     {
         internal class Worker<T>
         {
+#nullable enable
             private IOrderedEnumerable<FieldInfo> _fields;
             private readonly string _parasName;
 
@@ -131,8 +146,11 @@ namespace MineCombat
                 _parasName = string.Join(',', _fields.Select(f => f.FieldType.Name));
             }
 
-            public Action<T> Translate(Delegate dlg)
+            public Action<T>? Translate(Delegate dlg)
             {
+                if (dlg is null)
+                    return null;
+
                 if (_fields is not null)
                 {
                     var paras = dlg.Method.GetParameters();
@@ -141,6 +159,7 @@ namespace MineCombat
                 }
                 throw new ArgumentException($"需要参数为{_parasName}的无返回值函数");
             }
+#nullable disable
         }
 
         //用于转译多个参数为单个元组参数

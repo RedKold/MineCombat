@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static MineCombat.EventManager;
 
 namespace MineCombat
 {
@@ -123,21 +124,31 @@ namespace MineCombat
     public class Player : Entity
     {
 #nullable enable
+        public readonly string Name;
         public Slots<Card> Inventory { get; private set; }
         public Slots<Card> Situation { get; private set; }
         public Card? ArmorSlot;
         private Dictionary<Material, uint> _material_bag = new(23);
 
-        internal Player(double maxHealth, ITags tags, uint ivt = 36, uint sta = 3) : base(maxHealth, tags)
+        internal Player(string name, double maxHealth, ITags tags, uint ivt = 36, uint sta = 3) : base(maxHealth, tags)
         {
+            Name = name;
             Inventory = new(ivt);
             Situation = new(sta);
         }
 
-        internal Player(double maxHealth, uint ivt = 36, uint sta = 3) : base(maxHealth)
+        internal Player(string name, double maxHealth, uint ivt = 36, uint sta = 3) : base(maxHealth)
         {
+            Name = name;
             Inventory = new(ivt);
             Situation = new(sta);
+        }
+
+        internal void Play(uint index, Box<Entity>? targets)
+        {
+            Card card = Inventory[index];
+            Events.Trigger("CardDurabilityDamaged", (card, (uint)1));
+            CombatManager.Play(this, card, targets);
         }
 #nullable disable
     }

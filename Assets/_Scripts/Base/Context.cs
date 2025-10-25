@@ -8,16 +8,27 @@ namespace MineCombat
 {
     public class Context : Properties
     {
-        protected Box<string> _branches = new();
+#nullable enable
+        private readonly Stack<Card> _pre = new();
 
-        public void SetBranch(string branch)
+        public IReadOnlyList<Card> PreCards => _pre.ToList();
+        public Card? LastCard => _pre.Count == 0 ? null : _pre.Peek();
+        public Card? FirstCard => _pre.Count == 0 ? null : _pre.Last();
+
+        internal void Push(Card card)
         {
-            _branches.UpdateContent(branch);
+            _pre.Push(card);
         }
 
-        public void SetBranch(params string[] branches)
+        internal Card? Pop()
         {
-            _branches.UpdateContent(branches);
-        } 
+            return _pre.Count == 0 ? null : _pre.Pop();
+        }
+
+        internal void Clear()
+        {
+            _pre.Clear();
+        }
+#nullable disable
     }
 }

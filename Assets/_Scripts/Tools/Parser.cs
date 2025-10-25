@@ -297,6 +297,97 @@ namespace MineCombat
             '\u3000'  // 表意文字空格
         };
 
+        public static Box<string>?[]? ToBoxArray(string src, bool strict = false)
+        {
+            Tstring[] pairs = {
+                new Tstring(T.LIST, "{}"),
+                new Tstring(T.LIST, "()"),
+                new Tstring(T.LIST, "[]")
+            };
+            char[] quoters = { '"' };
+            Worker worker = new Worker(strict, pairs, quoters, commonIgnores, src, 2);
+            List<Tstring>? tokens = worker.result;
+            if (tokens?.Any() == true)
+            {
+                List<Box<string>?> result = new();
+                List<string> current = new();
+                bool inList = false;
+
+                foreach (var token in tokens)
+                {
+                    switch (token.type)
+                    {
+                        case T.NAME:
+                            return null;
+
+                        case T.LIST:
+                            inList = true;
+                            break;
+
+                        case T.VALUE:
+                            if (inList)
+                                current.Add(token.value);
+                            else
+                                result.Add(token.value);
+                            break;
+
+                        case T.END:
+                            if (inList)
+                            {
+                                inList = false;
+
+                                if (current.Count > 0)
+                                    result.Add(current.ToArray());
+                                else
+                                    result.Add(null);
+                                current.Clear();
+                            }
+                            else
+                                return result.ToArray();
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static Box<string>? ToBox(string src, bool strict = false)
+        {
+            Tstring[] pairs = {
+                new Tstring(T.LIST, "{}"),
+                new Tstring(T.LIST, "()"),
+                new Tstring(T.LIST, "[]")
+            };
+            char[] quoters = { '"' };
+            Worker worker = new Worker(strict, pairs, quoters, commonIgnores, src, 1);
+            List<Tstring>? tokens = worker.result;
+            if (tokens?.Any() == true)
+            {
+                List<string> list = new List<string>();
+
+                foreach (var token in tokens)
+                {
+                    switch (token.type)
+                    {
+                        case T.NAME:
+                            return null;
+
+                        case T.VALUE:
+                            list.Add(token.value);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                return new Box<string>(list.ToArray());
+            }
+            return null;
+        }
+
         public static IEnumerable<object>? ToCollection(string src, byte limit = 255, bool strict = false)
         {
             Tstring[] pairs = {
@@ -309,7 +400,7 @@ namespace MineCombat
             List<Tstring>? tokens = worker.result;
             if (tokens?.Any() == true)
             {
-                Stack<object> workingStack = new Stack<object>();
+                Stack<IEnumerable<object>> workingStack = new ();
 
                 foreach (var token in tokens)
                 {
