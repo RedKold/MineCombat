@@ -96,13 +96,13 @@ namespace MineCombat
                 return;
             }
             ShowWrapper(true);
-            CardDragSystem.Instance.StartDrag(this);
+            CardDragSystem.Instance.StartDrag(this,GetComponentInParent<HandView>());
         }
 
         void OnMouseUp()
         {
+            Debug.Log("Mouse up on card.");
             CardDragSystem.Instance.EndDrag();
         }
-
     }
 }

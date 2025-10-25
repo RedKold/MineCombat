@@ -70,9 +70,7 @@ public static class ModLoder
                 view.UpdateHealthDisplay();
             }
             Assert.IsNotNull(view, "CombatantView should not be null on CombatantDied event");
-        }));
-
-    
+        })); 
 
     }
 }
