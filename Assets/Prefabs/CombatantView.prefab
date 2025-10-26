@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3446387187649537943}
   - component: {fileID: 767745705167277853}
   - component: {fileID: 4413286474088451781}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 946335691851495309}
   - component: {fileID: 6426978429812169758}
   - component: {fileID: 957148219781439367}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -159,7 +159,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4673071519609894685}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wrapper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -193,7 +193,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7348855652089777594}
   - component: {fileID: 4796134138242645873}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Combatant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -276,7 +276,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8176014914853599217}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -314,7 +314,7 @@ GameObject:
   - component: {fileID: 4249642272022302877}
   - component: {fileID: 2957195481706354943}
   - component: {fileID: 2228013368305966690}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: HealthText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -485,7 +485,7 @@ GameObject:
   - component: {fileID: 3474842862312658567}
   - component: {fileID: 3648895336902900959}
   - component: {fileID: 1339151122228442274}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Name
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -655,7 +655,9 @@ GameObject:
   m_Component:
   - component: {fileID: 515042880030183300}
   - component: {fileID: 3106914883983566696}
-  m_Layer: 0
+  - component: {fileID: -2904597579653664674}
+  - component: {fileID: -4920424799690700055}
+  m_Layer: 3
   m_Name: CombatantView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -694,6 +696,42 @@ MonoBehaviour:
   healthText: {fileID: 2228013368305966690}
   healthBar: {fileID: 0}
   avatar: {fileID: 0}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 8
+--- !u!65 &-2904597579653664674
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7463902939504133536}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5, y: 5, z: 0.01}
+  m_Center: {x: -5.25, y: 0, z: 0}
+--- !u!114 &-4920424799690700055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7463902939504133536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85154aedc18471b498b1c424ecbdae65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7562596972369676478
 GameObject:
   m_ObjectHideFlags: 0
@@ -704,7 +742,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5769897108452386094}
   - component: {fileID: 7400001363283295640}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: HPBar
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -796,7 +834,7 @@ GameObject:
   - component: {fileID: 2743709385799780684}
   - component: {fileID: 524439574323207356}
   - component: {fileID: 2265697098805718794}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: StateCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}

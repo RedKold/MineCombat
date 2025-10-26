@@ -98,40 +98,43 @@ namespace MineCombat
 
             bool played = false;
 
-            // 检查是否在出牌区域内
-            // foreach (var playArea in playAreas)
-            // {
-            //     if (playArea.CanPlayCard(draggedCard))
-            //     {
-            //         if (playArea.TryPlayCard(draggedCard))
-            //         {
-            //             played = true;
-            //             Debug.Log($"成功出牌: {draggedCard.Card?.Name}");
-            //             break;
-            //         }
-            //     }
-            // }
-
-            Debug.DrawRay(draggedCard.transform.position, Vector3.forward * 10, Color.red, 1f);
-
             // Try our way to check if the card is played. use Ray
             if(Physics.Raycast(draggedCard.transform.position, Vector3.forward, out RaycastHit hitInfo, 10f, playAreaLayer))
             {
                 Debug.Log($"Raycast hit: {hitInfo.collider.name}");
                 IPlayArea playArea = hitInfo.collider.GetComponent<IPlayArea>();
+
+                // We need add a Collider check to see what this card is for
+                // for Single Entity
+                
+
                 Assert.IsNotNull(playArea, "PlayArea component not found on hit collider.");
                 if(playArea != null && playArea.CanPlayCard(draggedCard))
                 {
-                    if(playArea.TryPlayCard(draggedCard))
-                    {
-                        played = true;
-                        Debug.Log($"成功出牌: {draggedCard.Card?.Name}");
+                    var hitGameObject = hitInfo.collider.gameObject;
+                    Debug.Log($"命中的对象是:{hitGameObject.name}");
 
-                        // Remove the card from hand view
-                        // 广播
-                        Assert.IsNotNull(handView, "HandView is null when trying to remove played card.");
-                        handView.StartCoroutine(handView.RemoveCard(draggedCard));
+                    Box<Entity> target; 
+                    if(playArea is PlayerPlayArea playerArea)
+                    {
+                        Assert.IsNotNull(playerArea,"playArea is null!");
+                        Assert.IsNotNull(playerArea.Owner, "playerArea Owner is null!");
+                        Debug.Log($"命中的是玩家：{playerArea.Owner.Name}");
+                        target = new Box<Entity>(playerArea.Owner);
+
+                        if(playArea.TryPlayCard(draggedCard, target))
+                        {
+                            played = true;
+                            Debug.Log($"成功出牌: {draggedCard.Card?.Name}");
+
+                            // Remove the card from hand view
+                            // 广播
+                            Assert.IsNotNull(handView, "HandView is null when trying to remove played card.");
+                            handView.StartCoroutine(handView.RemoveCard(draggedCard));
+                        }
                     }
+
+                   
                 }
             }
 
@@ -252,7 +255,7 @@ namespace MineCombat
     public interface IPlayArea
     {
         bool CanPlayCard(CardView cardView);
-        bool TryPlayCard(CardView cardView);
+        bool TryPlayCard(CardView cardView, Box<Entity> targets);
         void SetHighlight(bool highlight);
     }
 

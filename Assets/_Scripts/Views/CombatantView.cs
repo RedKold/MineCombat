@@ -5,6 +5,8 @@ using TMPro;
 using MineCombat;
 using static MineCombat.EventManager;
 using Unity.VisualScripting;
+using System.Linq;
+using UnityEngine.Assertions;
 
 public class CombatantView : MonoBehaviour
 {
@@ -13,14 +15,59 @@ public class CombatantView : MonoBehaviour
     [SerializeField] private SpriteRenderer healthBar;
     [SerializeField] private SpriteRenderer avatar;
 
+    [SerializeField] private LayerMask layerMask;
+
+    [SerializeField] private PlayerPlayArea _playerPlayArea;
+
+    /*
+        isLocal: true means the Player is local endpoint in Multi-play, means the Player is not Entity, but the Main player in Single Game;
+    */
+    [SerializeField] private bool isLocal;
+
+    public bool is_local => isLocal;
+
+    public PlayerPlayArea playerPlayArea
+    {
+        get => _playerPlayArea;
+        set => _playerPlayArea = value;
+    }
+
     // 数据类改为 Player
     public Player player { get; private set; }
 
     public static List<CombatantView> AllViews = new List<CombatantView>();
+
+    public static List<Player> AllPlayers => AllViews.Select(v => v.player).ToList(); 
+
+
     private float _displayedHealthRatio = 1f;  // 当前显示的血量比例（用于平滑动画）
 
     private void Awake()
     {
+        // Bind the player for it.
+        if(player == null && this.is_local)
+        {
+           Debug.Log("Sign for player");
+            if (SinglePlayerSystem.Instance.isSingleGame)
+            {
+                player = SinglePlayerSystem.Instance.getPlayer();
+                Assert.IsNotNull(player, "Player is null!");
+                Debug.Log($"Init the single player from singleton, player name is {player.Name}");
+            }
+        }
+        if (player==null &&!this.is_local)
+        {
+            SinglePlayerSystem.Instance.initEnemy();
+            Debug.Log("Sign for enemy");
+            if (SinglePlayerSystem.Instance.isSingleGame)
+            {
+                player = SinglePlayerSystem.Instance.getEnemy();
+
+                Assert.IsNotNull(player, "Player is null!");
+                Debug.Log($"Init the single enemy from singleton, enemy name is {player.Name}");
+            }
+        }
+
         if (!AllViews.Contains(this))
             AllViews.Add(this);
     }
@@ -40,10 +87,19 @@ public class CombatantView : MonoBehaviour
         // 初始化显示
         SetPlayer(player.Name, player.GetHealth(), player.GetMaxHealth(), avatar != null ? avatar.sprite : null);
 
+        // 绑定游玩区域
+        playerPlayArea.SetPlayer(p);
 
         // 更新血条
         UpdateHealthDisplay();
         Debug.Log("Binding player view for " + player.Name);
+    }
+
+    // Get all other combatant without myself
+    public Box<Entity> GetWithOutP(Player p)
+    {
+        Player[] ans = AllPlayers.Where(v => v != p).ToArray();
+        return ans;
     }
 
     private void OnHealthChanged(Entity e)

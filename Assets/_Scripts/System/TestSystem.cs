@@ -8,7 +8,7 @@ public class TestSystem : MonoBehaviour
 
     private void Start()
     {
-
+        SinglePlayerSystem.Instance.initSinglePlayer();
     }
 
     private void Update()

@@ -24,6 +24,13 @@ namespace MineCombat
         [SerializeField] private Player _owner;
         public Player Owner => _owner;
 
+        public void SetOwner(Player o)
+        {
+         if (_owner == o) return;
+                // 可选：触发事件
+                _owner = o; 
+        }
+
         public Card Card { get; private set; }
 
         // 设置卡牌信息

@@ -12,6 +12,9 @@ public class HandView : MonoBehaviour
 
     private readonly List<CardView> cards = new();
 
+    // Bind the player for it
+    private readonly Player handOwner;
+
     public IEnumerator AddCard(CardView cardView)
     {
         if (cardView == null)
@@ -19,7 +22,10 @@ public class HandView : MonoBehaviour
             Debug.LogWarning("HandView AddCard called with null CardView.");
             yield return UpdateCardPositions(0.15f);
         }
+
+        cardView.SetOwner(handOwner);
         cards.Add(cardView);
+
         cardView.transform.SetParent(transform, false);
         yield return UpdateCardPositions(0.15f);
     }

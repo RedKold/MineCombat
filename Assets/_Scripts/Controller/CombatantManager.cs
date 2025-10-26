@@ -13,8 +13,12 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private float spacing = 100f;           // 战斗者间距
     [SerializeField] private Sprite[] combatantSprites;      // 可选角色贴图
 
+
+
     private Player[] players;
 
+
+    // CombatantManager. Init 2 enemy
     void Start()
     {
         if (combatantViewPrefab == null || viewParent == null)
@@ -44,6 +48,10 @@ public class CombatManager : MonoBehaviour
 
             // 绑定 Player 数据
             view.BindPlayer(players[i]);
+
+
+            // 绑定 PlayerArea 数据
+
 
             // 可选设置贴图
             if (combatantSprites != null && i < combatantSprites.Length)
