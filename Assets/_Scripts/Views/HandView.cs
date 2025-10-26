@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using MineCombat;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Splines;
 
 // this scripts is dealing with the hand view and some animations
@@ -13,7 +14,7 @@ public class HandView : MonoBehaviour
     private readonly List<CardView> cards = new();
 
     // Bind the player for it
-    private readonly Player handOwner;
+    private Player handOwner => SinglePlayerSystem.Instance.getPlayer();
 
     public IEnumerator AddCard(CardView cardView)
     {
@@ -25,6 +26,13 @@ public class HandView : MonoBehaviour
 
         cardView.SetOwner(handOwner);
         cards.Add(cardView);
+
+        // 维护玩家物品栏 
+        Assert.IsNotNull(handOwner, "handOwner is null");
+
+
+        handOwner.Inventory.Add(cardView.Card);
+
 
         cardView.transform.SetParent(transform, false);
         yield return UpdateCardPositions(0.15f);

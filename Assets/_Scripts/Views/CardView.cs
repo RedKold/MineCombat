@@ -20,15 +20,22 @@ namespace MineCombat
         [SerializeField] private GameObject dragger_behaviour;
         [SerializeField] private LayerMask playAreaLayerMask;
 
+        [SerializeField] private Card card;
+
         // All cards need a player
         [SerializeField] private Player _owner;
         public Player Owner => _owner;
 
         public void SetOwner(Player o)
         {
-         if (_owner == o) return;
-                // 可选：触发事件
-                _owner = o; 
+            if (_owner == o) return;
+            _owner = o; 
+
+            if(o is null)
+            {
+                // Set default Player 
+                _owner =  SinglePlayerSystem.Instance.isSingleGame ? SinglePlayerSystem.Instance.getPlayer():null;
+            }
         }
 
         public Card Card { get; private set; }

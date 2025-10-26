@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Assertions;
 using static MineCombat.EventManager;
 
 namespace MineCombat
@@ -149,6 +151,8 @@ namespace MineCombat
         internal void Play(uint index, Box<Entity>? targets)
         {
             Card card = Inventory[index];
+
+            Assert.IsNotNull(card, "The card is Null");
             Events.Trigger("CardDurabilityDamaged", (card, (uint)1));
             CombatManager.Play(this, card, targets);
         }

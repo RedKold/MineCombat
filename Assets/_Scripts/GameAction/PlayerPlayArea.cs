@@ -3,6 +3,7 @@ using UnityEngine;
 using MineCombat;
 using UnityEngine.Assertions;
 using TMPro;
+using System.Collections;
 /**
     This file provide a interface for IPlayArea
     Though it has the name "Area", but it not actually as the check if card hit any area. 
@@ -10,6 +11,11 @@ using TMPro;
 public class PlayerPlayArea : MonoBehaviour, IPlayArea
 {
     [SerializeField] private Player _owner; // Inspector assign
+
+    [SerializeField] private SpriteRenderer highlightFrame; // 高亮框
+    [SerializeField] private float highlightFadeDuration = 0.3f; // 渐变时间
+
+    private Coroutine _highlightCoroutine;
     public Player Owner => _owner;
     private void Start()
     {
@@ -17,7 +23,7 @@ public class PlayerPlayArea : MonoBehaviour, IPlayArea
         Player _p = this.GetComponentInParent<CombatantView>().player;
         SetPlayer(_p);
 
-        if(_p == null)
+        if (_p == null)
         {
             Debug.LogWarning("Set the player for PlayerPlayArea failed. set default global player");
             SetPlayer(SinglePlayerSystem.Instance.getPlayer());
@@ -25,6 +31,11 @@ public class PlayerPlayArea : MonoBehaviour, IPlayArea
         else
         {
             Debug.Log($"Set the player succeed, name is {_p.Name}");
+        }
+
+        if(highlightFrame != null)
+        {
+            highlightFrame.color = new Color(1f, 1f, 1f, 0f);
         }
     }
 
@@ -61,7 +72,7 @@ public class PlayerPlayArea : MonoBehaviour, IPlayArea
             // add your things.
         }
         // 在这里处理卡牌被打出的逻辑
-        Debug.Log($"Card {cardView.Card.Name} played in PlayerPlayArea.");
+        Debug.Log($"Card {cardView.Card.Name} played in PlayerPlayArea. Infos: Cost is: {cardView.Card.cost}.");
         // 你可以在这里触发游戏行动，更新状态等
 
         Player player = cardView.Owner;
@@ -78,10 +89,33 @@ public class PlayerPlayArea : MonoBehaviour, IPlayArea
         return true;
     }
 
+   // ✅ 高亮逻辑
     public void SetHighlight(bool highlight)
     {
-        Debug.Log($"PlayerPlayArea highlight set to: {highlight}");
-        return;
-        // 可选：实现高亮显示逻辑
+        if (highlightFrame == null) return;
+
+        if (_highlightCoroutine != null)
+            StopCoroutine(_highlightCoroutine);
+
+        _highlightCoroutine = StartCoroutine(FadeHighlight(highlight));
+    }
+
+    private IEnumerator FadeHighlight(bool highlight)
+    {
+        Color color = highlightFrame.color;
+        float startAlpha = color.a;
+        float targetAlpha = highlight ? 1f : 0f;
+        float elapsed = 0f;
+
+        while (elapsed < highlightFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / highlightFadeDuration);
+            float newAlpha = Mathf.Lerp(startAlpha, targetAlpha, t);
+            highlightFrame.color = new Color(1f, 1f, 1f, newAlpha);
+            yield return null;
+        }
+
+        highlightFrame.color = new Color(1f, 1f, 1f, targetAlpha);
     }
 }

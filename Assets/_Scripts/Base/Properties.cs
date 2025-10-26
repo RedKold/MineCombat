@@ -369,6 +369,8 @@ namespace MineCombat
         static Properties()
         {
             //在这里添加属性的默认值
+            // 默认耐久度
+            Default.Store("mc_card_durability_max", 1);
         }
 #nullable disable
     }
